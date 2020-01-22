@@ -1,0 +1,3 @@
+CREATE DATABASE wbtrack;
+CREATE USER wbuser WITH PASSWORD 'wbpassword';
+GRANT ALL PRIVILEGES ON DATABASE wbtrack to wbuser;

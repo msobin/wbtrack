@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  app:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    volumes:
+      - ./docker/log:/var/log/app
+      - ./app:/wbtrack/app
+    links:
+      - postgres
+
+  postgres:
+    env_file:
+      - .env
+    image: postgres:latest
+    volumes:
+      - ~/.ssh:/root/.ssh
+      - ./docker/log:/var/log/container
+      - ./docker/postgres/data:/var/lib/postgresql/data
+    ports:
+      - "54322:5432"
+    logging:
+      driver: json-file
+      options:
+        max-size: "128m"
+        max-file: "10"
+    restart: on-failure

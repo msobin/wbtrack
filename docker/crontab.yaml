@@ -1,0 +1,8 @@
+jobs:
+  - name: wbscrapy_new
+    command: cd /wbtrack/app/wbscrapy && /usr/local/bin/scrapy crawl products -a type=new
+    schedule: "*/30 * * * *"
+
+  - name: wbscrapy_regular
+    command: cd /wbtrack/app/wbscrapy && /usr/local/bin/scrapy crawl products
+    schedule: "0 */2 * * *"

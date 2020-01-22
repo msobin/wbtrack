@@ -1,0 +1,10 @@
+.idea
+
+venv
+.env
+docker-compose.yml
+
+docker/log/*
+app/wbscrapy/debug.json
+
+!.gitkeep
