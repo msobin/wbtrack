@@ -1,8 +1,8 @@
 import json
 
-from app.common.models import User, Product, ProductPrice, UserProduct
-from app.common.session import session
-from app.wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
+from common.models import User, Product, ProductPrice, UserProduct
+from common.session import session
+from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
 
 
 def inline_callback(update, context):

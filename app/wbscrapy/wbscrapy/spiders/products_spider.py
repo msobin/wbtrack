@@ -2,8 +2,8 @@ import scrapy
 from scrapy.loader import ItemLoader
 from wbscrapy.items import Product
 
-import app.common.models as models
-from app.common.session import session
+import common.models as models
+from common.session import session
 
 
 class ProductsSpider(scrapy.Spider):

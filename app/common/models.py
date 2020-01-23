@@ -5,7 +5,7 @@ from sqlalchemy import Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-from app.common.session import engine
+from common.session import engine
 
 Base = declarative_base()
 

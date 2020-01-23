@@ -2,9 +2,9 @@ import json
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from app.common.models import ProductPrice
-from app.common.session import session
-from app.common.models import UserProduct
+from common.models import ProductPrice
+from common.session import session
+from common.models import UserProduct
 
 
 def get_product_card(product):

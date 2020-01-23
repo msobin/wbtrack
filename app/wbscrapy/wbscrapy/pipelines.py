@@ -1,6 +1,4 @@
-import datetime
-
-from app.common.models import *
+from common.models import *
 
 
 class PostgresPipeline(object):

@@ -2,10 +2,10 @@ import json
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
 
-from app.common.models import User
-from app.common.session import session
-from app.wbbot.misc.product_card import get_product_card, get_product_markup
-from app.common.models import Product, UserProduct
+from common.models import User
+from common.session import session
+from wbbot.misc.product_card import get_product_card, get_product_markup
+from common.models import Product, UserProduct
 from sqlalchemy import func
 
 

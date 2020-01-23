@@ -4,9 +4,8 @@ RUN apt-get update \
     && apt-get install -y supervisor libpq-dev cron \
     && pip install --upgrade pip
 
-WORKDIR /wbtrack/app
+WORKDIR /app
 
-COPY ./requirements.txt /wbtrack/app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN pip install yacron

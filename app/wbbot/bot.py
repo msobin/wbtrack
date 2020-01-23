@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
-import app.wbbot.handlers.actions as actions
-import app.wbbot.handlers.commands as commands
-import app.wbbot.handlers.messages as messages
-import app.wbbot.misc.env as env
-import app.wbbot.misc.jobs as jobs
-import logging
+import wbbot.handlers.actions as actions
+import wbbot.handlers.commands as commands
+import wbbot.handlers.messages as messages
+import common.env as env
+import wbbot.misc.jobs as jobs
 
 # logging.basicConfig()
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)

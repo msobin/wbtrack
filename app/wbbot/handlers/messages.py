@@ -1,11 +1,11 @@
 import re
 from urllib import parse
 
-from app.common.models import User, UserProduct, Product, UserProductSettings
-from app.common.session import session
+from common.models import User, UserProduct, Product, UserProductSettings
+from common.session import session
 from sqlalchemy import or_, and_
-from app.wbbot.misc.product_card import get_product_card, get_product_markup
-import app.wbbot.misc.env as env
+from wbbot.misc.product_card import get_product_card, get_product_markup
+import common.env as env
 
 
 def message_add_product(update, context):

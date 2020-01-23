@@ -1,6 +1,6 @@
-from app.common.models import ProductPrice, UserProduct, UserProductSettings
-from app.common.session import session
-from app.wbbot.misc.product_card import get_price_icon, get_product_markup
+from common.models import ProductPrice, UserProduct, UserProductSettings
+from common.session import session
+from wbbot.misc.product_card import get_price_icon, get_product_markup
 
 
 def check_prices(context):
@@ -16,18 +16,18 @@ def check_prices(context):
             product_price.status = ProductPrice.STATUS_PROCESSED
             continue
 
-        price_icon = get_price_icon(product.current_price_value, product.previous_price_value)
-        prev_price = ProductPrice.format_price_value(product.previous_price_value, product.domain)
-        cur_price = ProductPrice.format_price_value(product.current_price_value, product.domain)
-
-        price_text = f'{prev_price} → {cur_price}'
-
-        user_products = session.query(UserProduct).filter_by(product_id=6).join(UserProduct.settings).filter(
+        user_products = session.query(UserProduct).filter_by(product_id=product.id).join(UserProduct.settings).filter(
             UserProductSettings.is_price_notify == True).all()
 
         if not len(user_products):
             product_price.status = ProductPrice.STATUS_PROCESSED
         else:
+            price_icon = get_price_icon(product.current_price_value, product.previous_price_value)
+            prev_price = ProductPrice.format_price_value(product.previous_price_value, product.domain)
+            cur_price = ProductPrice.format_price_value(product.current_price_value, product.domain)
+
+            price_text = f'{prev_price} → {cur_price}'
+
             for user_product in user_products:
                 text = f'⚠️ Обновилась цена на {product.header}\n\n{price_icon} {price_text}'
                 reply_markup = get_product_markup(user_product.user.id, product)

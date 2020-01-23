@@ -9,3 +9,5 @@ Telegram-бот для отслеживания цен на товары в ин
 
 * Шаг 1
 * Шаг 2
+
+docker-compose exec app python /app/init_db.py
