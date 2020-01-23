@@ -31,7 +31,7 @@ def action_prices_history(query, data):
     user = User.get_user(query.from_user.id, session)
 
     product = session.query(Product).filter_by(id=data['product_id']).first()
-    product_prices = product.prices[:10]
+    product_prices = product.prices[:30]
 
     text = f'📈 Цены на {product.header}\n\n'
 
