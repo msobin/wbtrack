@@ -40,7 +40,7 @@ class UserProduct(Base):
 
     product = relationship('Product')
     user = relationship('User')
-    settings = relationship('UserProductSettings',  uselist=False, back_populates='user_product')
+    settings = relationship('UserProductSettings', uselist=False)
 
 
 class UserProductSettings(Base):
@@ -52,7 +52,7 @@ class UserProductSettings(Base):
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    user_product = relationship('UserProduct',  uselist=False, back_populates='settings')
+    user_product = relationship('UserProduct', uselist=False)
 
 
 class Product(Base):

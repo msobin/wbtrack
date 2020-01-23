@@ -1,6 +1,6 @@
 import json
 
-from common.models import User, Product, ProductPrice, UserProduct
+from common.models import User, Product, ProductPrice, UserProduct, UserProductSettings
 from common.session import session
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
 
@@ -12,13 +12,15 @@ def inline_callback(update, context):
 
 def action_delete_product(query, data):
     user = User.get_user(query.from_user.id, session)
+    product_id = data['product_id']
 
-    product = session.query(Product).filter_by(id=data['product_id']).first()
+    product = session.query(Product).filter_by(id=product_id).first()
     user_product = session.query(UserProduct).filter_by(user_id=user.id,
-                                                        product_id=data['product_id']).first()
+                                                        product_id=product_id).first()
 
     if user_product:
-        session.query(UserProduct).filter_by(user_id=user.id, product_id=data['product_id']).delete()
+        session.query(UserProductSettings).filter_by(user_product_id=user_product.id).delete()
+        session.query(UserProduct).filter_by(user_id=user.id, product_id=product_id).delete()
         product.ref_count -= 1
         session.commit()
     else:
@@ -73,5 +75,9 @@ def action_price_notify(query, data):
     user_product.settings.is_price_notify = not data['n']
     session.commit()
 
-    return query.message.reply_text(
-        'Уведомления включены' if user_product.settings.is_price_notify else 'Уведомления отключены')
+    if user_product.settings.is_price_notify:
+        text = f'🔔 Включены уведомления для {user_product.product.header}'
+    else:
+        text = f'🔕 Отключены уведомления для {user_product.product.header}'
+
+    return query.message.reply_html(text, reply_markup=get_product_markup(user.id, product=user_product.product))
