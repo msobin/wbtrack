@@ -24,14 +24,16 @@ def action_delete_product(query, data):
     else:
         return query.message.reply_text('❗ Товар не найден')
 
-    return query.message.reply_html(f'❌ Товар {product.name_f} удален из списка')
+    return query.message.reply_html(f'❌ Товар {product.header} удален из списка')
 
 
 def action_prices_history(query, data):
+    user = User.get_user(query.from_user.id, session)
+
     product = session.query(Product).filter_by(id=data['product_id']).first()
     product_prices = product.prices[:10]
 
-    text = f'📈 Цены на {product.name_f}\n\n'
+    text = f'📈 Цены на {product.header}\n\n'
 
     if not product_prices:
         text += 'нет данных'
@@ -48,7 +50,7 @@ def action_prices_history(query, data):
 
         text += f'{product_price.created_at.date()}  {price_icon} {price_value}\n'
 
-    return query.message.reply_html(text, reply_markup=get_product_markup(product))
+    return query.message.reply_html(text, reply_markup=get_product_markup(user.id, product))
 
 
 def action_brand_list(query, data):
@@ -58,4 +60,18 @@ def action_brand_list(query, data):
     for user_product in user.user_products:
         if user_product.product.brand == brand:
             query.message.reply_html(get_product_card(user_product.product),
-                                     reply_markup=get_product_markup(user_product.product))
+                                     reply_markup=get_product_markup(user.id, user_product.product))
+
+
+def action_price_notify(query, data):
+    user = User.get_user(query.from_user.id, session)
+    user_product = session.query(UserProduct).filter_by(user_id=user.id, product_id=data['product_id']).first()
+
+    if not user_product:
+        return
+
+    user_product.settings.is_price_notify = not data['n']
+    session.commit()
+
+    return query.message.reply_text(
+        'Уведомления включены' if user_product.settings.is_price_notify else 'Уведомления отключены')

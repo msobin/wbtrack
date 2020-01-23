@@ -1,10 +1,9 @@
 import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, ARRAY
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, ARRAY, Boolean
 from sqlalchemy import Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from telegram import Update
 
 from app.common.session import engine
 
@@ -38,8 +37,22 @@ class UserProduct(Base):
     user_id = Column(Integer, ForeignKey('user.id'), index=True)
     product_id = Column(Integer, ForeignKey('product.id'), index=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
+
     product = relationship('Product')
     user = relationship('User')
+    settings = relationship('UserProductSettings',  uselist=False, back_populates='user_product')
+
+
+class UserProductSettings(Base):
+    __tablename__ = 'user_product_settings'
+
+    id = Column(Integer, primary_key=True)
+    user_product_id = Column(Integer, ForeignKey('user_product.id'), index=True)
+    is_price_notify = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+    user_product = relationship('UserProduct',  uselist=False, back_populates='settings')
 
 
 class Product(Base):
@@ -104,7 +117,7 @@ class Product(Base):
             return None
 
     @property
-    def name_f(self):
+    def header(self):
         return f'<a href="{self.url}">{self.brand} / {self.name}</a>'
 
     @property

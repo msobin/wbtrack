@@ -12,9 +12,6 @@ def check_prices(context):
     for product_price in product_prices:
         product = product_price.product
 
-        user_ids = session.query(UserProduct.user_id).filter_by(product_id=product.id).distinct()
-        telegram_ids = session.query(User.telegram_id).filter(User.id.in_(user_ids)).distinct()
-
         if not product.previous_price:
             product_price.status = ProductPrice.STATUS_PROCESSED
             continue
@@ -25,15 +22,17 @@ def check_prices(context):
 
         price_text = f'{prev_price} → {cur_price}'
 
-        if not telegram_ids.count():
+        user_products = session.query(UserProduct).filter_by(product_id=product.id).all()
+
+        if not len(user_products):
             product_price.status = ProductPrice.STATUS_PROCESSED
         else:
-            for telegram_id in telegram_ids:
-                text = f'⚠️ Обновилась цена на {product.name_f}\n\n{price_icon} {price_text}'
-                reply_markup = get_product_markup(product)
+            for user_product in user_products:
+                text = f'⚠️ Обновилась цена на {product.header}\n\n{price_icon} {price_text}'
+                reply_markup = get_product_markup(user_product.user.id, product)
 
                 context.job_queue.run_once(notify_user, 1,
-                                           context={'telegram_id': telegram_id[0], 'text': text,
+                                           context={'telegram_id': user_product.user.telegram_id, 'text': text,
                                                     'reply_markup': reply_markup})
 
             product_price.status = ProductPrice.STATUS_PROCESSED

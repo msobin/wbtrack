@@ -1,7 +1,7 @@
 import re
 from urllib import parse
 
-from app.common.models import User, UserProduct, Product
+from app.common.models import User, UserProduct, Product, UserProductSettings
 from app.common.session import session
 from sqlalchemy import or_, and_
 from app.wbbot.misc.product_card import get_product_card, get_product_markup
@@ -30,7 +30,8 @@ def message_add_product(update, context):
         return update.message.reply_text(
             f'Вы отслеживаете максимально допустимое количество товаров: {env.MAX_PRODUCT_COUNT})')
 
-    session.add(UserProduct(user_id=user.id, product_id=product.id))
+    session.add(UserProduct(user_id=user.id, product_id=product.id, settings=UserProductSettings()))
+
     product.ref_count += 1
     session.commit()
 
@@ -49,4 +50,4 @@ def message_search(update, context):
         update.message.reply_text('Совпадений не найдено')
 
     for product in products:
-        update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(product))
+        update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))

@@ -7,7 +7,8 @@ engine = create_engine('postgresql+psycopg2://{user}:{password}@{host}:{port}/{d
     password=os.getenv('POSTGRES_WB_PASSWORD', 'wbpassword'),
     host=os.getenv('POSTGRES_HOST', 'localhost'),
     port=os.getenv('POSTGRES_PORT', 5432),
-    database=os.getenv('POSTGRES_WB_DB', 'wbtrack')
+    database=os.getenv('POSTGRES_WB_DB', 'wbtrack'),
+    echo=True
 ))
 
 session = sessionmaker(bind=engine)()
