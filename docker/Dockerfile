@@ -6,10 +6,11 @@ RUN apt-get update \
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-RUN pip install yacron
+COPY ./app/requirements.txt /app/requirements.txt
+COPY ./docker/supervisord.conf /etc/supervisord.conf
 COPY ./docker/crontab.yaml /etc/crontab.yaml
 
-COPY ./docker/supervisord.conf /etc/supervisord.conf
+RUN pip install -r requirements.txt
+RUN pip install yacron
+
 CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
