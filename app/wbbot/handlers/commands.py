@@ -16,6 +16,7 @@ def command_start(update, context):
         '/ping - потыкать бота палочкой\n'
         '/list - список товаров\n'
         '/search - поиск товара\n'
+        '/brand_list - список брендов'
     )
 
 
@@ -47,7 +48,7 @@ def command_brand_list(update, context):
             callback_data=json.dumps({'action': 'brand_list', 'brand': brand})
         )])
 
-    return update.message.reply_html('Брэнды:', reply_markup=InlineKeyboardMarkup(buttons))
+    return update.message.reply_html('Бренды:', reply_markup=InlineKeyboardMarkup(buttons))
 
 
 def command_ping(update, context):
