@@ -8,8 +8,8 @@ import app.wbbot.misc.env as env
 import app.wbbot.misc.jobs as jobs
 import logging
 
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+# logging.basicConfig()
+# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 updater = Updater(env.BOT_TOKEN, use_context=True)
 job_queue = updater.job_queue
