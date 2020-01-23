@@ -9,7 +9,7 @@ services:
       dockerfile: ./docker/Dockerfile
     volumes:
       - ./docker/log:/var/log/app
-      - ./app:/wbtrack/app
+      - ./app:/app
     links:
       - postgres
 
@@ -22,7 +22,7 @@ services:
       - ./docker/log:/var/log/container
       - ./docker/postgres/data:/var/lib/postgresql/data
     ports:
-      - "54322:5432"
+      - "5432:5432"
     logging:
       driver: json-file
       options:
