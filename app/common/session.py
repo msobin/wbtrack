@@ -12,5 +12,3 @@ engine = create_engine('postgresql+psycopg2://{user}:{password}@{host}:{port}/{d
 ))
 
 session = sessionmaker(bind=engine)()
-
-

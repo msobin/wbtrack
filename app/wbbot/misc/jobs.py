@@ -1,4 +1,4 @@
-from app.common.models import ProductPrice, User, UserProduct
+from app.common.models import ProductPrice, UserProduct, UserProductSettings
 from app.common.session import session
 from app.wbbot.misc.product_card import get_price_icon, get_product_markup
 
@@ -22,7 +22,8 @@ def check_prices(context):
 
         price_text = f'{prev_price} → {cur_price}'
 
-        user_products = session.query(UserProduct).filter_by(product_id=product.id).all()
+        user_products = session.query(UserProduct).filter_by(product_id=6).join(UserProduct.settings).filter(
+            UserProductSettings.is_price_notify == True).all()
 
         if not len(user_products):
             product_price.status = ProductPrice.STATUS_PROCESSED
