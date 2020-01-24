@@ -152,4 +152,14 @@ class ProductPrice(Base):
         return {'kz': 'тг.', 'ru': 'руб.'}.get(domain, '')
 
 
+class CatalogCategory(Base):
+    __tablename__ = 'catalog_category'
+    __table_args__ = (Index('uix_catalog_category_name', 'name', unique=True),)
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, index=True)
+    title = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+
+
 Base.metadata.create_all(engine)
