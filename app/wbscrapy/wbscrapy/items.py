@@ -7,7 +7,6 @@
 
 import scrapy
 from scrapy.loader.processors import TakeFirst, Identity
-from scrapy.selector import Selector
 
 
 def get_price(value):
@@ -21,13 +20,6 @@ def get_images(value):
     return list(map(lambda href: 'https:' + href, value))
 
 
-def get_categories(breadcrumbs):
-    pass
-    # for a in breadcrumbs[1:-1]:
-    #     selector = Selector(text=a)
-    #     val = selector.xpath('//a/@href').extract_first()
-
-
 class Product(scrapy.Item):
     product_model = scrapy.Field(output_processor=TakeFirst())
     picker = scrapy.Field(output_processor=Identity())
@@ -36,4 +28,3 @@ class Product(scrapy.Item):
     images = scrapy.Field(input_processor=get_images)
     price = scrapy.Field(input_processor=get_price, output_processor=TakeFirst())
     description = scrapy.Field(output_processor=TakeFirst())
-    categories = scrapy.Field(input_processor=get_categories)
