@@ -22,10 +22,10 @@ def get_images(value):
 
 
 def get_categories(breadcrumbs):
-    pass
-    # for a in breadcrumbs[1:-1]:
-    #     selector = Selector(text=a)
-    #     val = selector.xpath('//a/@href').extract_first()
+    parts = []
+    for a in breadcrumbs[1:]:
+        selector = Selector(text=a)
+        parts.append(selector.xpath('//a/@href').extract_first().split('/')[-1])
 
 
 class Product(scrapy.Item):
