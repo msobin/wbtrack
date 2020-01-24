@@ -6,6 +6,7 @@ import wbbot.handlers.commands as commands
 import wbbot.handlers.messages as messages
 import common.env as env
 import wbbot.misc.jobs as jobs
+import logging
 
 # logging.basicConfig()
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
