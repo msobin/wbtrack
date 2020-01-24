@@ -24,8 +24,7 @@ class ProductsSpider(scrapy.Spider):
             status = models.Product.STATUS_REGULAR
 
         for product in self.session.query(models.Product).filter_by(status=status).all():
-            yield scrapy.Request(url=product.url, callback=self.parse,
-                                 cb_kwargs={'product_model': product, 'catalog_categories': catalog_categories})
+            yield scrapy.Request(url=product.url, callback=self.parse, cb_kwargs={'product_model': product})
 
     def parse(self, response, **kwargs):
         product_model = kwargs.get('product_model')
