@@ -2,6 +2,7 @@ import scrapy
 from scrapy.loader import ItemLoader
 from scrapy.selector import Selector
 from wbscrapy.items import Product
+import hashlib
 
 import common.models as models
 from common.models import CatalogCategory
@@ -25,18 +26,18 @@ class ProductsSpider(scrapy.Spider):
         else:
             status = models.Product.STATUS_REGULAR
 
-        catalog_categories = {}
+        catalog_categories = []
         for product in self.session.query(models.Product).filter_by(status=status).all():
             yield scrapy.Request(url=product.url, callback=self.parse,
                                  cb_kwargs={'product_model': product, 'catalog_categories': catalog_categories})
 
         categories = session.query(CatalogCategory).filter(
-            CatalogCategory.name.in_(list(catalog_categories.keys()))).all()
+            CatalogCategory.title.in_(list(catalog_categories))).all()
 
-        diff_keys = list(set(catalog_categories.keys()) - set(list(map(lambda cc: cc.name, categories))))
+        diff = list(set(catalog_categories) - set(list(map(lambda cc: cc.name, categories))))
 
-        for key in diff_keys:
-            self.session.add(CatalogCategory(name=key, title=catalog_categories[key]))
+        for category in diff:
+            self.session.add(CatalogCategory(hash=hashlib.md5(category).hexdigest(), title=category))
 
         self.session.commit()
 
@@ -56,12 +57,9 @@ class ProductsSpider(scrapy.Spider):
         loader.add_xpath('description', '//div[contains(@class, "description-text")]/p/text()')
         loader.add_xpath('categories', '//ul[@class="bread-crumbs"]/li/a')
 
-        breadcrumbs = response.selector.xpath('//ul[@class="bread-crumbs"]/li/a').extract()
+        item = loader.load_item()
 
-        for item in breadcrumbs[1:-1]:
-            selector = Selector(text=item)
-            category = selector.xpath('//a/@href').extract_first().split('/')[-1]
-            title = selector.xpath('//a/span/text()').extract_first()
-            catalog_categories[category] = title
+        categories = item.get('categories')
+        catalog_categories = item.get('categories').split('/')
 
-        return loader.load_item()
+        return item

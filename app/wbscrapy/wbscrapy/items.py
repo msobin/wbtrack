@@ -25,7 +25,8 @@ def get_categories(breadcrumbs):
     parts = []
     for a in breadcrumbs[1:]:
         selector = Selector(text=a)
-        parts.append(selector.xpath('//a/@href').extract_first().split('/')[-1])
+        parts.append(selector.xpath('//a/span/text()').extract_first())
+    return '/'.join(parts)
 
 
 class Product(scrapy.Item):
@@ -36,4 +37,4 @@ class Product(scrapy.Item):
     images = scrapy.Field(input_processor=get_images)
     price = scrapy.Field(input_processor=get_price, output_processor=TakeFirst())
     description = scrapy.Field(output_processor=TakeFirst())
-    categories = scrapy.Field(input_processor=get_categories)
+    categories = scrapy.Field(input_processor=get_categories, output_processor=TakeFirst())
