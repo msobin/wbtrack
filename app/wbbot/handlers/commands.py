@@ -36,7 +36,7 @@ def command_search(update, context):
                               reply_markup=ForceReply())
 
 
-def command_brand_list(update, context):
+def command_brands(update, context):
     user_product_ids = session.query(UserProduct.product_id).filter_by(user_id=3).distinct()
     group = session.query(Product.brand, func.count(Product.brand)).filter(Product.id.in_(user_product_ids)).group_by(
         Product.brand).all()

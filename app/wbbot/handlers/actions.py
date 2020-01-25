@@ -55,7 +55,7 @@ def action_prices_history(query, data):
     return query.message.reply_html(text, reply_markup=get_product_markup(user.id, product))
 
 
-def action_brands(query, data):
+def action_brand_list(query, data):
     brand = data['brand']
     user = User.get_user(query.from_user.id, session)
 
