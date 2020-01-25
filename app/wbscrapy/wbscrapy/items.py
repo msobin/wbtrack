@@ -8,6 +8,7 @@
 import scrapy
 from scrapy.loader.processors import TakeFirst, Identity
 from scrapy.selector import Selector
+import hashlib
 
 
 def get_price(value):
@@ -22,11 +23,13 @@ def get_images(value):
 
 
 def get_categories(breadcrumbs):
-    parts = []
+    categories = []
     for a in breadcrumbs[1:]:
         selector = Selector(text=a)
-        parts.append(selector.xpath('//a/span/text()').extract_first())
-    return '/'.join(parts)
+        categories.append(selector.xpath('//a/span/text()').extract_first())
+
+    return list(map(lambda category: {'hash': hashlib.md5(category.encode('utf-8')).hexdigest(), 'category': category},
+                    categories))
 
 
 class Product(scrapy.Item):
@@ -37,4 +40,4 @@ class Product(scrapy.Item):
     images = scrapy.Field(input_processor=get_images)
     price = scrapy.Field(input_processor=get_price, output_processor=TakeFirst())
     description = scrapy.Field(output_processor=TakeFirst())
-    categories = scrapy.Field(input_processor=get_categories, output_processor=TakeFirst())
+    categories = scrapy.Field(input_processor=get_categories)

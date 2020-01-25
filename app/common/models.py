@@ -71,6 +71,7 @@ class Product(Base):
     picker = Column(ARRAY(Integer), default=[])
     ref_count = Column(Integer, default=0)
     status = Column(Integer, default=1, index=True)
+    catalog_category_ids = Column(ARRAY(Integer), default=[])
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 

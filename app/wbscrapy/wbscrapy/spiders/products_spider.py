@@ -1,11 +1,8 @@
 import scrapy
 from scrapy.loader import ItemLoader
-from scrapy.selector import Selector
 from wbscrapy.items import Product
-import hashlib
 
 import common.models as models
-from common.models import CatalogCategory
 from common.session import session
 
 
@@ -26,24 +23,11 @@ class ProductsSpider(scrapy.Spider):
         else:
             status = models.Product.STATUS_REGULAR
 
-        catalog_categories = []
         for product in self.session.query(models.Product).filter_by(status=status).all():
-            yield scrapy.Request(url=product.url, callback=self.parse,
-                                 cb_kwargs={'product_model': product, 'catalog_categories': catalog_categories})
-
-        categories = session.query(CatalogCategory).filter(
-            CatalogCategory.title.in_(list(catalog_categories))).all()
-
-        diff = list(set(catalog_categories) - set(list(map(lambda cc: cc.name, categories))))
-
-        for category in diff:
-            self.session.add(CatalogCategory(hash=hashlib.md5(category).hexdigest(), title=category))
-
-        self.session.commit()
+            yield scrapy.Request(url=product.url, callback=self.parse, cb_kwargs={'product_model': product})
 
     def parse(self, response, **kwargs):
         product_model = kwargs.get('product_model')
-        catalog_categories = kwargs.get('catalog_categories')
 
         loader = ItemLoader(item=Product(), response=response)
 
@@ -57,9 +41,4 @@ class ProductsSpider(scrapy.Spider):
         loader.add_xpath('description', '//div[contains(@class, "description-text")]/p/text()')
         loader.add_xpath('categories', '//ul[@class="bread-crumbs"]/li/a')
 
-        item = loader.load_item()
-
-        categories = item.get('categories')
-        catalog_categories = item.get('categories').split('/')
-
-        return item
+        return loader.load_item()
