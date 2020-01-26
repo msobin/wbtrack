@@ -5,10 +5,11 @@
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/items.html
 
+import hashlib
+
 import scrapy
 from scrapy.loader.processors import TakeFirst, Identity
 from scrapy.selector import Selector
-import hashlib
 
 
 def get_price(value):
@@ -40,4 +41,3 @@ class Product(scrapy.Item):
     images = scrapy.Field(input_processor=get_images)
     price = scrapy.Field(input_processor=get_price, output_processor=TakeFirst())
     description = scrapy.Field(output_processor=TakeFirst())
-    categories = scrapy.Field(input_processor=get_categories)
