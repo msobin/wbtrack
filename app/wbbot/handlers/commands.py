@@ -51,5 +51,23 @@ def command_brands(update, context):
     return update.message.reply_html('Бренды:', reply_markup=InlineKeyboardMarkup(buttons))
 
 
+def command_catalog(update, context):
+    user = User.get_user(update.message.from_user.id, session)
+    level = 1
+
+    sql = (
+        f'select catalog_category_ids[{level}], count(catalog_category_ids[{level}]), cc.title as category_id from product\n'
+        f'left join catalog_category cc on cc.id = catalog_category_ids[{level}]\n'
+        f'where product.id in (select product.id from user_product where user_id={user.id})\n'
+        f'group by catalog_category_ids[{level}], cc.title\n'
+        'order by cc.title\n'
+    )
+    rows = session.execute(sql).fetchall()
+
+    for row in rows:
+        (category_id, product_cout, category_title) = row
+        pass
+
+
 def command_ping(update, context):
     update.message.reply_text('pong')

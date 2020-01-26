@@ -41,3 +41,4 @@ class Product(scrapy.Item):
     images = scrapy.Field(input_processor=get_images)
     price = scrapy.Field(input_processor=get_price, output_processor=TakeFirst())
     description = scrapy.Field(output_processor=TakeFirst())
+    categories = scrapy.Field(input_processor=get_categories)
