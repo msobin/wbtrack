@@ -89,7 +89,7 @@ def action_catalog_category(query, data):
     category_id = data['id']
     rows = get_catalog(session, user.id, data['level'], category_id)
 
-    if len(rows) == 0:
+    if len(rows) < 2:
         product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
         products = session.query(Product).filter(Product.id.in_(product_ids),
                                                  Product.catalog_category_ids.any(category_id))
@@ -98,4 +98,4 @@ def action_catalog_category(query, data):
                                      reply_markup=get_product_markup(user.id, product))
 
     else:
-        return query.message.reply_html('Каталог', reply_markup=get_catalog_markup(rows))
+        return query.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))

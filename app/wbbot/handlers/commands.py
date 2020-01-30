@@ -52,7 +52,7 @@ def command_brands(update, context):
             callback_data=json.dumps({'action': 'brand_list', 'brand': brand})
         )])
 
-    return update.message.reply_html('Бренды:', reply_markup=InlineKeyboardMarkup(buttons))
+    return update.message.reply_html('👓 Бренды:', reply_markup=InlineKeyboardMarkup(buttons))
 
 
 def command_catalog(update, context):
@@ -62,7 +62,7 @@ def command_catalog(update, context):
     if len(rows) == 0:
         return update.message.reply_html('Нет данных')
 
-    return update.message.reply_html('Каталог', reply_markup=get_catalog_markup(rows))
+    return update.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
 
 
 def command_ping(update, context):

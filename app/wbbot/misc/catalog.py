@@ -14,8 +14,6 @@ def get_catalog(session, user_id, level, category_id=None):
     sql += f'\ngroup by catalog_category_ids[{level}], cc.title\n' \
            'order by cc.title'
 
-    'and catalog_category_ids[2] = 2'
-
     return session.execute(sql).fetchall()
 
 
