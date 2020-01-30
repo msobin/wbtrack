@@ -1,5 +1,5 @@
-from app.common.session import session
-import app.common.env as env
+from common.session import session
+import common.env as env
 
 session.connection().connection.set_isolation_level(0)
 session.execute(f'CREATE DATABASE {env.DB}')
