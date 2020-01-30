@@ -14,12 +14,10 @@ def command_start(update, context):
     update.message.reply_text(
         'Отправьте боту ссылку на товар, чтобы начать отслеживание цен\n\n'
         '/help - справка\n'
-        '/ping - потыкать бота палочкой\n'
         '/list - список товаров\n'
         '/search - поиск товара\n'
         '/brands - список брендов\n',
         '/catalog - каталог товаров\n'
-
     )
 
 
