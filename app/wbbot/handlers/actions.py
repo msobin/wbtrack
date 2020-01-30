@@ -1,5 +1,6 @@
 import json
 
+from app.wbbot.misc.catalog import get_catalog, get_catalog_markup
 from common.models import User, Product, ProductPrice, UserProduct, UserProductSettings
 from common.session import session
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
@@ -81,3 +82,20 @@ def action_price_notify(query, data):
         text = f'🔕 Отключены уведомления для {user_product.product.header}'
 
     return query.message.reply_html(text, reply_markup=get_product_markup(user.id, product=user_product.product))
+
+
+def action_catalog_category(query, data):
+    user = User.get_user(query.from_user.id, session)
+    category_id = data['id']
+    rows = get_catalog(session, user.id, data['level'], category_id)
+
+    if len(rows) == 0:
+        product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
+        products = session.query(Product).filter(Product.id.in_(product_ids),
+                                                 Product.catalog_category_ids.any(category_id))
+        for product in products:
+            query.message.reply_html(get_product_card(product),
+                                     reply_markup=get_product_markup(user.id, product))
+
+    else:
+        return query.message.reply_html('Каталог', reply_markup=get_catalog_markup(rows))
