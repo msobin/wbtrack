@@ -39,5 +39,6 @@ class ProductsSpider(scrapy.Spider):
                          '//div[contains(@class, "pv-carousel")]//a[contains(@class, "j-carousel-image")]/@href')
         loader.add_xpath('price', '//span[@class="final-cost"]/text()')
         loader.add_xpath('description', '//div[contains(@class, "description-text")]/p/text()')
+        loader.add_xpath('categories', '//ul[@class="bread-crumbs"]/li/a')
 
         return loader.load_item()

@@ -71,6 +71,7 @@ class Product(Base):
     picker = Column(ARRAY(Integer), default=[])
     ref_count = Column(Integer, default=0)
     status = Column(Integer, default=1, index=True)
+    catalog_category_ids = Column(ARRAY(Integer), default=[])
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
@@ -154,10 +155,10 @@ class ProductPrice(Base):
 
 class CatalogCategory(Base):
     __tablename__ = 'catalog_category'
-    __table_args__ = (Index('uix_catalog_category_name', 'name', unique=True),)
+    __table_args__ = (Index('uix_catalog_category_hash', 'hash', unique=True),)
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, index=True)
+    hash = Column(String(32), index=True)
     title = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
