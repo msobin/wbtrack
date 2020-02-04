@@ -17,6 +17,16 @@ def get_catalog(session, user_id, level, category_id=None):
     return session.execute(sql).fetchall()
 
 
+def get_count_wo_category(session, user_id):
+    sql = 'select count(*) from product\n' \
+          f'where product.id in (select product_id from user_product where user_id={user_id})' \
+          ' and catalog_category_ids is null'
+
+    count, = session.execute(sql).fetchone()
+
+    return count
+
+
 def get_catalog_markup(rows):
     buttons = []
 

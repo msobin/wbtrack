@@ -7,7 +7,7 @@ from common.session import session
 from wbbot.misc.product_card import get_product_card, get_product_markup
 from common.models import Product, UserProduct
 from sqlalchemy import func
-from wbbot.misc.catalog import get_catalog, get_catalog_markup
+from wbbot.misc.catalog import get_catalog, get_catalog_markup, get_count_wo_category
 
 
 def command_start(update, context):
@@ -56,9 +56,13 @@ def command_brands(update, context):
 def command_catalog(update, context):
     user = User.get_user(update.message.from_user.id, session)
     rows = get_catalog(session, user.id, 1)
+    wo_category_count = get_count_wo_category(session, user.id)
 
-    if len(rows) == 0:
+    if len(rows) == 0 and wo_category_count == 0:
         return update.message.reply_html('Нет данных')
+
+    if wo_category_count != 0:
+        rows.append((None, wo_category_count, 'Прочие'))
 
     return update.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
 

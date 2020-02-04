@@ -87,15 +87,26 @@ def action_price_notify(query, data):
 def action_catalog_category(query, data):
     user = User.get_user(query.from_user.id, session)
     category_id = data['id']
-    rows = get_catalog(session, user.id, data['level'], category_id)
 
-    if len(rows) < 2:
+    if category_id is None:
         product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
         products = session.query(Product).filter(Product.id.in_(product_ids),
-                                                 Product.catalog_category_ids.any(category_id))
+                                                 Product.catalog_category_ids.is_(None))
+
         for product in products:
             query.message.reply_html(get_product_card(product),
                                      reply_markup=get_product_markup(user.id, product))
 
     else:
-        return query.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
+        rows = get_catalog(session, user.id, data['level'], category_id)
+
+        if len(rows) < 2:
+            product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
+            products = session.query(Product).filter(Product.id.in_(product_ids),
+                                                     Product.catalog_category_ids.any(category_id))
+            for product in products:
+                query.message.reply_html(get_product_card(product),
+                                         reply_markup=get_product_markup(user.id, product))
+
+        else:
+            return query.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
