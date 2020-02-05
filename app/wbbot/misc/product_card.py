@@ -9,7 +9,11 @@ from common.models import UserProduct
 
 def get_product_card(product):
     card = f'🛍️ {product.header}\n\n'
-    card += f'<b>{format_product_price(product)}</b>'
+    card += f'<b>{format_product_price(product)}</b>\n'
+
+    if product.size_list:
+        card += get_size_list(product)
+
     return card
 
 
@@ -53,3 +57,8 @@ def get_price_icon(current_value, prev_value):
             price_icon = '🔺'
 
     return price_icon
+
+
+def get_size_list(product):
+    return '📏 <b>' + ', '.join(product.size_list) + '</b>\n' if product.size_list else ''
+

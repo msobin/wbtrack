@@ -1,6 +1,6 @@
 from common.models import ProductPrice, UserProduct, UserProductSettings
 from common.session import session
-from wbbot.misc.product_card import get_price_icon, get_product_markup
+from wbbot.misc.product_card import get_price_icon, get_product_markup, get_size_list
 
 
 def check_prices(context):
@@ -30,6 +30,10 @@ def check_prices(context):
 
             for user_product in user_products:
                 text = f'⚠️ Обновилась цена на {product.header}\n\n{price_icon} {price_text}'
+
+                if product.size_list:
+                    text += '\n' + get_size_list(product)
+
                 reply_markup = get_product_markup(user_product.user.id, product)
 
                 context.job_queue.run_once(notify_user, 1,

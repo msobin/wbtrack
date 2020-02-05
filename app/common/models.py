@@ -72,6 +72,7 @@ class Product(Base):
     ref_count = Column(Integer, default=0)
     status = Column(Integer, default=1, index=True)
     catalog_category_ids = Column(ARRAY(Integer), default=[])
+    size_list = Column(ARRAY(String), default=[])
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
