@@ -26,6 +26,7 @@ class PostgresPipeline(object):
         product_model.brand = product['brand']
         product_model.images = product.get('images', [])
         product_model.picker = picker
+        product_model.size_list = product['size_list']
         product_model.updated_at = datetime.datetime.now()
         product_model.catalog_category_ids = PostgresPipeline.process_categories(spider.session, product.get(
             'categories')) if product.get('categories') else None

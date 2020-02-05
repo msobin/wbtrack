@@ -40,5 +40,6 @@ class ProductsSpider(scrapy.Spider):
         loader.add_xpath('price', '//span[@class="final-cost"]/text()')
         loader.add_xpath('description', '//div[contains(@class, "description-text")]/p/text()')
         loader.add_xpath('categories', '//ul[@class="bread-crumbs"]/li/a')
+        loader.add_xpath('size_list', '//div[contains(@class, "size-list") and not(contains(@class, "hide"))]/label[not(contains(@class, "disabled"))]/@data-size-name')
 
         return loader.load_item()
