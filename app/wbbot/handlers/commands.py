@@ -11,12 +11,12 @@ from wbbot.misc.catalog import get_catalog, get_catalog_markup, get_count_wo_cat
 
 
 def command_start(update, context):
-    update.message.reply_text(
-        'Отправьте боту ссылку на товар, чтобы начать отслеживание цен\n\n'
+    update.message.reply_html(
+        'Отправьте боту ссылку на товар\n\n'
         '/help - справка\n'
         '/list - список товаров\n'
         '/search - поиск товара\n'
-        '/brands - список брендов\n',
+        '/brands - список брендов\n'
         '/catalog - каталог товаров\n'
     )
 
