@@ -26,9 +26,9 @@ def message_add_product(update, context):
     if user_product:
         return update.message.reply_text('Вы уже отслеживаете этот товар')
 
-    if session.query(UserProduct).filter_by(user_id=user.id).count() >= env.MAX_PRODUCT_COUNT:
+    if session.query(UserProduct).filter_by(user_id=user.id).count() >= user.max_product_count:
         return update.message.reply_text(
-            f'Вы отслеживаете максимально допустимое количество товаров: {env.MAX_PRODUCT_COUNT})')
+            f'Вы отслеживаете максимально допустимое количество товаров: {user.max_product_count})')
 
     session.add(UserProduct(user_id=user.id, product_id=product.id, settings=UserProductSettings()))
 

@@ -5,6 +5,7 @@ from sqlalchemy import Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
+import common.env as env
 from common.session import engine
 
 Base = declarative_base()
@@ -15,6 +16,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     telegram_id = Column(Integer, index=True)
+    max_product_count = Column(Integer, default=env.MAX_PRODUCT_COUNT)
     created_at = Column(DateTime, default=datetime.datetime.now)
     user_products = relationship('UserProduct')
 
