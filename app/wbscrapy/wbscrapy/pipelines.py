@@ -22,19 +22,19 @@ class PostgresPipeline(object):
                     Product(code=code, domain=product_model.domain, status=Product.STATUS_NEW))
 
         product_model.status = Product.STATUS_REGULAR
-        product_model.name = product['name']
-        product_model.brand = product['brand']
+        product_model.name = product.get('name')
+        product_model.brand = product.get('brand')
         product_model.images = product.get('images', [])
         product_model.picker = picker
-        product_model.size_list = product['size_list']
+        product_model.size_list = product.get('size_list')
         product_model.updated_at = datetime.datetime.now()
         product_model.catalog_category_ids = PostgresPipeline.process_categories(spider.session, product.get(
             'categories')) if product.get('categories') else None
 
         current_price = product_model.current_price_value
 
-        if current_price != product['price']:
-            spider.session.add(ProductPrice(product_id=product_model.id, value=product['price']))
+        if current_price != product.get('price'):
+            spider.session.add(ProductPrice(product_id=product_model.id, value=product.get('price')))
 
         spider.session.commit()
 
