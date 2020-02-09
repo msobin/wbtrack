@@ -6,3 +6,7 @@ jobs:
   - name: wbscrapy_regular
     command: cd /app/wbscrapy && /usr/local/bin/scrapy crawl products
     schedule: "0 */2 * * *"
+
+  - name: update_proxies
+    command: cd /app/wbscrapy && python proxies.py
+    schedule: 0 */12 * * *"

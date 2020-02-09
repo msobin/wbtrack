@@ -5,6 +5,7 @@ venv
 docker-compose.yml
 
 docker/log/*
+docker/data/*
 app/wbscrapy/debug.json
 
 !.gitkeep
