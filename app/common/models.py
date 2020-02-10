@@ -20,17 +20,6 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.now)
     user_products = relationship('UserProduct')
 
-    @staticmethod
-    def get_user(user_id, session):
-        user = session.query(User).filter_by(telegram_id=user_id).first()
-
-        if not user:
-            session.add(User(telegram_id=user_id))
-            session.commit()
-            user = session.query(User).filter_by(telegram_id=user_id).first()
-
-        return user
-
 
 class UserProduct(Base):
     __tablename__ = 'user_product'

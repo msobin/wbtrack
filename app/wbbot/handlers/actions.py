@@ -1,9 +1,10 @@
 import json
 
-from wbbot.misc.catalog import get_catalog, get_catalog_markup
-from common.models import User, Product, ProductPrice, UserProduct, UserProductSettings
+from common.models import Product, ProductPrice, UserProduct, UserProductSettings
 from common.session import session
+from wbbot.misc.catalog import get_catalog, get_catalog_markup
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
+from wbbot.misc.user import get_user
 
 
 def inline_callback(update, context):
@@ -12,7 +13,7 @@ def inline_callback(update, context):
 
 
 def action_delete_product(query, data):
-    user = User.get_user(query.from_user.id, session)
+    user = get_user(query.from_user.id, session)
     product_id = data['product_id']
 
     product = session.query(Product).filter_by(id=product_id).first()
@@ -31,7 +32,7 @@ def action_delete_product(query, data):
 
 
 def action_prices_history(query, data):
-    user = User.get_user(query.from_user.id, session)
+    user = get_user(query.from_user.id, session)
 
     product = session.query(Product).filter_by(id=data['product_id']).first()
     product_prices = product.prices[:30]
@@ -58,7 +59,7 @@ def action_prices_history(query, data):
 
 def action_brand_list(query, data):
     brand = data['brand']
-    user = User.get_user(query.from_user.id, session)
+    user = get_user(query.from_user.id, session)
 
     for user_product in user.user_products:
         if user_product.product.brand == brand:
@@ -67,7 +68,7 @@ def action_brand_list(query, data):
 
 
 def action_price_notify(query, data):
-    user = User.get_user(query.from_user.id, session)
+    user = get_user(query.from_user.id, session)
     user_product = session.query(UserProduct).filter_by(user_id=user.id, product_id=data['product_id']).first()
 
     if not user_product:
@@ -85,7 +86,7 @@ def action_price_notify(query, data):
 
 
 def action_catalog_category(query, data):
-    user = User.get_user(query.from_user.id, session)
+    user = get_user(query.from_user.id, session)
     category_id = data['id']
 
     if category_id is None:
