@@ -9,4 +9,4 @@ jobs:
 
   - name: update_proxies
     command: cd /app/wbscrapy && python proxies.py
-    schedule: 0 */12 * * *"
+    schedule: "0 */12 * * *"
