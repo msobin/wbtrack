@@ -1,15 +1,17 @@
 import re
 from urllib import parse
 
-from common.models import User, UserProduct, Product, UserProductSettings
-from common.session import session
 from sqlalchemy import or_, and_
-from wbbot.misc.product_card import get_product_card, get_product_markup
+
 import common.env as env
+from common.models import UserProduct, Product, UserProductSettings
+from common.session import session
+from wbbot.misc.product_card import get_product_card, get_product_markup
+from wbbot.misc.user import get_user
 
 
 def message_add_product(update, context):
-    user = User.get_user(update.message.from_user.id, session)
+    user = get_user(update.message.from_user.id, session)
     matches = re.findall(env.PRODUCT_REGEXP, update.message.text)
 
     if matches:
@@ -39,7 +41,7 @@ def message_add_product(update, context):
 
 
 def message_search(update, context):
-    user = User.get_user(update.message.from_user.id, session)
+    user = get_user(update.message.from_user.id, session)
     products_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
 
     q = '%' + update.message.text + '%'
