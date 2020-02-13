@@ -1,4 +1,4 @@
-from app.common.models import User
+from common.models import User
 
 
 def get_user(telegram_id, session):
