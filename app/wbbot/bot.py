@@ -21,6 +21,7 @@ dispatcher.add_handler(CommandHandler('list', commands.command_list))
 dispatcher.add_handler(CommandHandler('search', commands.command_search))
 dispatcher.add_handler(CommandHandler('brands', commands.command_brands))
 dispatcher.add_handler(CommandHandler('catalog', commands.command_catalog))
+dispatcher.add_handler(CommandHandler('logout', commands.command_logout))
 
 dispatcher.add_handler(MessageHandler(Filters.reply, messages.message_search))
 dispatcher.add_handler(MessageHandler(Filters.regex(env.PRODUCT_REGEXP), messages.message_add_product))

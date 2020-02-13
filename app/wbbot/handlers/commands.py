@@ -18,6 +18,7 @@ def command_start(update, context):
         '/search - поиск товара\n'
         '/brands - список брендов\n'
         '/catalog - каталог товаров\n'
+        '/logout - выход\n'
     )
 
 
@@ -69,3 +70,14 @@ def command_catalog(update, context):
 
 def command_ping(update, context):
     update.message.reply_text('pong')
+
+
+def command_logout(update, context):
+    user = get_user(update.message.from_user.id, session)
+
+    session.query(UserProduct).filter_by(user_id=user.id).delete()
+    session.delete(user)
+    session.commit()
+
+    update.message.reply_html('👋 Все Ваши данные удалены, бот больше не будет Вас беспокоить')
+
