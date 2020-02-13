@@ -14,7 +14,3 @@ def get_user(telegram_id, session):
 def create_user(telegram_id, session):
     session.add(User(telegram_id=telegram_id))
     session.commit()
-
-
-def delete_user(telegram_id):
-    pass
