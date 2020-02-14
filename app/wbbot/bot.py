@@ -7,28 +7,43 @@ import wbbot.handlers.messages as messages
 import common.env as env
 import wbbot.misc.jobs as jobs
 import logging
+import time
+from telegram.error import NetworkError
 
-# logging.basicConfig()
-# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-updater = Updater(env.BOT_TOKEN, use_context=True)
-job_queue = updater.job_queue
-dispatcher = updater.dispatcher
+def main():
+    logging.basicConfig(filename=env.LOG_DIR + '/bot.log', level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s')
 
-dispatcher.add_handler(CommandHandler('ping', commands.command_ping))
-dispatcher.add_handler(CommandHandler(['start', 'help'], commands.command_start))
-dispatcher.add_handler(CommandHandler('list', commands.command_list))
-dispatcher.add_handler(CommandHandler('search', commands.command_search))
-dispatcher.add_handler(CommandHandler('brands', commands.command_brands))
-dispatcher.add_handler(CommandHandler('catalog', commands.command_catalog))
-dispatcher.add_handler(CommandHandler('logout', commands.command_logout))
+    # logging.basicConfig()
+    # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-dispatcher.add_handler(MessageHandler(Filters.reply, messages.message_search))
-dispatcher.add_handler(MessageHandler(Filters.regex(env.PRODUCT_REGEXP), messages.message_add_product))
+    updater = Updater(env.BOT_TOKEN, use_context=True)
+    job_queue = updater.job_queue
+    dispatcher = updater.dispatcher
 
-dispatcher.add_handler(CallbackQueryHandler(actions.inline_callback))
+    dispatcher.add_handler(CommandHandler('ping', commands.command_ping))
+    dispatcher.add_handler(CommandHandler(['start', 'help'], commands.command_start))
+    dispatcher.add_handler(CommandHandler('list', commands.command_list))
+    dispatcher.add_handler(CommandHandler('search', commands.command_search))
+    dispatcher.add_handler(CommandHandler('brands', commands.command_brands))
+    dispatcher.add_handler(CommandHandler('catalog', commands.command_catalog))
+    dispatcher.add_handler(CommandHandler('logout', commands.command_logout))
 
-job_queue.run_repeating(jobs.check_prices, env.NOTIFY_INTERVAL, 1)
+    dispatcher.add_handler(MessageHandler(Filters.reply, messages.message_search))
+    dispatcher.add_handler(MessageHandler(Filters.regex(env.PRODUCT_REGEXP), messages.message_add_product))
 
-updater.start_polling()
-updater.idle()
+    dispatcher.add_handler(CallbackQueryHandler(actions.inline_callback))
+
+    job_queue.run_repeating(jobs.check_prices, env.NOTIFY_INTERVAL, 1)
+
+    try:
+        updater.start_polling()
+        updater.idle()
+    except NetworkError as e:
+        logging.error('Network error:' + e.message)
+        time.sleep(60 * 5)
+
+
+if __name__ == "__main__":
+    main()
