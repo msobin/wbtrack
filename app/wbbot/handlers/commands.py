@@ -3,7 +3,7 @@ import json
 from sqlalchemy import func
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
 
-from common.models import Product, UserProduct
+from common.models import Product, UserProduct, UserProductSettings
 from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup, get_count_wo_category
 from wbbot.misc.product_card import get_product_card, get_product_markup
@@ -75,10 +75,12 @@ def command_ping(update, context):
 
 def command_logout(update, context):
     user = get_user(update.message.from_user.id, session)
+    user_product_ids = session.query(UserProduct.id).filter_by(user_id=user.id).distinct()
 
+    session.query(UserProductSettings).filter(UserProductSettings.user_product_id.in_(user_product_ids)).delete(
+        synchronize_session='fetch')
     session.query(UserProduct).filter_by(user_id=user.id).delete()
     session.delete(user)
     session.commit()
 
-    update.message.reply_html('👋 Все Ваши данные удалены, бот больше не будет Вас беспокоить')
-
+    update.message.reply_html('👋 Все Ваши данные удалены.')
