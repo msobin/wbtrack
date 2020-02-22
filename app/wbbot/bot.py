@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
+import logging
+import time
+from logging.handlers import TimedRotatingFileHandler
+
+from telegram.error import NetworkError
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
+import common.env as env
 import wbbot.handlers.actions as actions
 import wbbot.handlers.commands as commands
 import wbbot.handlers.messages as messages
-import common.env as env
 import wbbot.misc.jobs as jobs
-import logging
-import time
-from telegram.error import NetworkError
 
 
 def main():
-    logging.basicConfig(filename=env.LOG_DIR + '/bot.log', level=logging.INFO,
+    logging.basicConfig(level=logging.INFO,
+                        handlers=[TimedRotatingFileHandler(filename=env.LOG_DIR + '/bot.log', when='midnight',
+                                                           backupCount=7)],
                         format='%(asctime)s - %(levelname)s - %(message)s')
 
     # logging.basicConfig()
