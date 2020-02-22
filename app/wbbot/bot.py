@@ -39,13 +39,6 @@ def main():
 
     dispatcher.add_handler(CallbackQueryHandler(actions.inline_callback))
 
-    dispatcher.add_handler(ConversationHandler(
-        entry_points=[CommandHandler('search', commands.command_search)],
-        states={
-            1: [MessageHandler(Filters.text, messages.message_search)]
-        },
-    ))
-
     job_queue.run_repeating(jobs.check_prices, env.NOTIFY_INTERVAL, 1)
 
     try:

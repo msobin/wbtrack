@@ -41,15 +41,18 @@ def message_add_product(update, context):
 
 
 def message_search(update, context):
-    user = get_user(update.message.from_user.id, session)
-    products_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
+    if context.user_data['action'] == 'search':
+        user = get_user(update.message.from_user.id, session)
+        products_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
 
-    q = '%' + update.message.text + '%'
-    products = session.query(Product).filter(
-        and_(or_(Product.name.ilike(q), Product.brand.ilike(q)), Product.id.in_(products_ids))).all()
+        q = '%' + update.message.text + '%'
+        products = session.query(Product).filter(
+            and_(or_(Product.name.ilike(q), Product.brand.ilike(q)), Product.id.in_(products_ids))).all()
 
-    if not products:
-        update.message.reply_text('Совпадений не найдено')
+        if not products:
+            update.message.reply_text('Совпадений не найдено')
 
-    for product in products:
-        update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))
+        for product in products:
+            update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))
+
+    del context.user_data['action']

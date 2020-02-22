@@ -34,9 +34,9 @@ def command_list(update, context):
 
 
 def command_search(update, context):
+    context.user_data['action'] = 'search'
     update.message.reply_text('Введите часть названия товара или бренда',
                               reply_markup=ForceReply())
-    return 1
 
 
 def command_brands(update, context):
