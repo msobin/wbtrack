@@ -4,7 +4,7 @@ import time
 from logging.handlers import TimedRotatingFileHandler
 
 from telegram.error import NetworkError
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ConversationHandler
 
 import common.env as env
 import wbbot.handlers.actions as actions
@@ -38,6 +38,13 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.regex(env.PRODUCT_REGEXP), messages.message_add_product))
 
     dispatcher.add_handler(CallbackQueryHandler(actions.inline_callback))
+
+    dispatcher.add_handler(ConversationHandler(
+        entry_points=[CommandHandler('search', commands.command_search)],
+        states={
+            1: [MessageHandler(Filters.text, messages.message_search)]
+        },
+    ))
 
     job_queue.run_repeating(jobs.check_prices, env.NOTIFY_INTERVAL, 1)
 
