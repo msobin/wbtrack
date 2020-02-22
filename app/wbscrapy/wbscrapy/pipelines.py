@@ -29,7 +29,7 @@ class PostgresPipeline(object):
         product_model.size_list = product.get('size_list')
         product_model.updated_at = datetime.datetime.now()
         product_model.catalog_category_ids = PostgresPipeline.process_categories(spider.session, product.get(
-            'categories')) if product.get('categories') else None
+            'categories')) if product.get('categories') else []
 
         current_price = product_model.current_price_value
 

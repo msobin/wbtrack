@@ -20,7 +20,7 @@ def get_catalog(session, user_id, level, category_id=None):
 def get_count_wo_category(session, user_id):
     sql = 'select count(*) from product\n' \
           f'where product.id in (select product_id from user_product where user_id={user_id})' \
-          ' and catalog_category_ids is null'
+          " and catalog_category_ids = '{}'"
 
     count, = session.execute(sql).fetchone()
 
