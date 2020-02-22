@@ -24,7 +24,7 @@ def menu_item_select(update, context):
     if item == MENU_ITEM_HOME:
         path = None
     elif item == MENU_ITEM_BACK:
-        path = '.'.join(path.split('.')[:-1])
+        path = '.'.join(path.split('.')[:-1]) if path else None
     else:
         path = '.'.join([path, item]) if path else item
 
@@ -36,7 +36,8 @@ def menu_item_select(update, context):
         return globals()[sub_menu](update, context)
 
     context.user_data['menu_path'] = path
-    update.message.reply_text('test', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False))
+
+    return update.message.reply_text(item, reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False))
 
 
 def get_reply_keyboard(path):
@@ -45,7 +46,7 @@ def get_reply_keyboard(path):
     reply_keyboard = [[key] for key in sub_menu.keys()]
 
     if path:
-        reply_keyboard.append([MENU_ITEM_BACK])
+        # reply_keyboard.append([MENU_ITEM_BACK])
         reply_keyboard.append([MENU_ITEM_HOME])
 
     return reply_keyboard
@@ -59,6 +60,17 @@ def get_sub_menu(path):
             sub_menu = sub_menu.get(key)
 
     return sub_menu
+
+
+# def get_sub_menu(obj, key):
+#     if key in obj:
+#         return obj[key]
+#
+#     for k, v in obj.items():
+#         if isinstance(v, dict):
+#             return get_sub_menu(v, key)
+#
+#     return None
 
 
 def action_search(update, context):

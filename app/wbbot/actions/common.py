@@ -23,8 +23,7 @@ def products_list(update, context):
 
 def products_search(update, context):
     context.user_data['action'] = 'search'
-    update.message.reply_text('Введите часть названия товара или бренда',
-                              reply_markup=ForceReply())
+    update.message.reply_text('Введите часть названия товара или бренда')
 
 
 def brands_list(update, context):
