@@ -3,22 +3,20 @@ import json
 from sqlalchemy import func
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
 
-from common.models import Product, UserProduct
+from common.models import Product, UserProduct, UserProductSettings
 from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup, get_count_wo_category
 from wbbot.misc.product_card import get_product_card, get_product_markup
 from wbbot.misc.user import get_user
 
 
-def products_list(update, context):
+def products_list_all(update, context):
     user = get_user(update.message.from_user.id, session)
 
-    if not user.user_products:
-        update.message.reply_text('Список товаров пуст')
+    product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
+    products = session.query(Product).filter(Product.id.in_(product_ids)).distinct()
 
-    for user_product in user.user_products:
-        product = user_product.product
-        update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))
+    return products_list(update, context, user, products)
 
 
 def products_search(update, context):
@@ -56,6 +54,17 @@ def products_catalog(update, context):
     return update.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
 
 
+def product_list_by_notify(update, context, is_notify):
+    user = get_user(update.message.from_user.id, session)
+
+    product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).join(UserProduct.settings).filter(
+        UserProductSettings.is_price_notify == is_notify).distinct()
+
+    products = session.query(Product).filter(Product.id.in_(product_ids)).distinct()
+
+    return products_list(update, context, user, products)
+
+
 def logout(update, context):
     user = get_user(update.message.from_user.id, session)
 
@@ -64,3 +73,13 @@ def logout(update, context):
     session.commit()
 
     update.message.reply_html('👋 Все Ваши данные удалены, бот больше не будет Вас беспокоить')
+
+
+def products_list(update, context, user, products):
+    products = list(products)
+
+    if not products:
+        update.message.reply_text('Список пуст')
+
+    for product in products:
+        update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))

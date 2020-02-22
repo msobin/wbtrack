@@ -18,7 +18,7 @@ def command_start(update, context):
 
 
 def command_list(update, context):
-    return actions.products_list(update, context)
+    return actions.products_list_all(update, context)
 
 
 def command_search(update, context):
