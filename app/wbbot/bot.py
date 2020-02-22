@@ -11,13 +11,14 @@ import wbbot.handlers.actions as actions
 import wbbot.handlers.commands as commands
 import wbbot.handlers.messages as messages
 import wbbot.misc.jobs as jobs
+import wbbot.handlers.menu as menu
 
 
 def main():
-    logging.basicConfig(level=logging.INFO,
-                        handlers=[TimedRotatingFileHandler(filename=env.LOG_DIR + '/bot.log', when='midnight',
-                                                           backupCount=7)],
-                        format='%(asctime)s - %(levelname)s - %(message)s')
+    # logging.basicConfig(level=logging.INFO,
+    #                     handlers=[TimedRotatingFileHandler(filename=env.LOG_DIR + '/bot.log', when='midnight',
+    #                                                        backupCount=7)],
+    #                     format='%(asctime)s - %(levelname)s - %(message)s')
 
     # logging.basicConfig()
     # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
@@ -33,6 +34,7 @@ def main():
     dispatcher.add_handler(CommandHandler('brands', commands.command_brands))
     dispatcher.add_handler(CommandHandler('catalog', commands.command_catalog))
     dispatcher.add_handler(CommandHandler('logout', commands.command_logout))
+    dispatcher.add_handler(CommandHandler('menu', menu.start))
 
     dispatcher.add_handler(MessageHandler(Filters.reply, messages.message_search))
     dispatcher.add_handler(MessageHandler(Filters.regex(env.PRODUCT_REGEXP), messages.message_add_product))
