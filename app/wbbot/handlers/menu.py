@@ -51,7 +51,7 @@ MENU_ITEM_BACK = '🔙 Назад'
 
 menu = {
     '🔍 Найти': {
-        '👀 По названию': action_search,
+        '🔤 По названию': action_search,
         '🔔 С уведомлениями': action_products_with_notify,
         '🔕 Без уведомления': action_products_without_notify,
     },
