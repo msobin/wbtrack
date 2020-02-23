@@ -4,14 +4,13 @@ import time
 from logging.handlers import TimedRotatingFileHandler
 
 from telegram.error import NetworkError
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ConversationHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 import common.env as env
-import wbbot.handlers.inline as actions
 import wbbot.handlers.commands as commands
+import wbbot.handlers.inline as actions
 import wbbot.handlers.messages as messages
 import wbbot.misc.jobs as jobs
-import wbbot.handlers.menu as menu
 
 
 def main():
