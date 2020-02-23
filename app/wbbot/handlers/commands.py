@@ -1,13 +1,7 @@
-import json
+from telegram import ReplyKeyboardMarkup
 
-from sqlalchemy import func
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
-
-from common.models import Product, UserProduct, UserProductSettings
-from common.session import session
-from wbbot.misc.catalog import get_catalog, get_catalog_markup, get_count_wo_category
-from wbbot.misc.product_card import get_product_card, get_product_markup
-from wbbot.misc.user import get_user
+import wbbot.actions.common as actions
+from wbbot.handlers.menu import menu
 
 
 def command_start(update, context):
@@ -18,55 +12,25 @@ def command_start(update, context):
         '/search - поиск товара\n'
         '/brands - список брендов\n'
         '/catalog - каталог товаров\n'
-        '/logout - выход\n'
+        '/logout - выход\n',
+        reply_markup=ReplyKeyboardMarkup([[key] for key in menu.keys()])
     )
 
 
 def command_list(update, context):
-    user = get_user(update.message.from_user.id, session)
-
-    if not user.user_products:
-        update.message.reply_text('Список товаров пуст')
-
-    for user_product in user.user_products:
-        product = user_product.product
-        update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))
+    return actions.products_list_all(update, context)
 
 
 def command_search(update, context):
-    context.user_data['action'] = 'search'
-    update.message.reply_text('Введите часть названия товара или бренда',
-                              reply_markup=ForceReply())
+    return actions.products_search(update, context)
 
 
 def command_brands(update, context):
-    user = get_user(update.message.from_user.id, session)
-    user_product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
-    group = session.query(Product.brand, func.count(Product.brand)).filter(Product.id.in_(user_product_ids)).group_by(
-        Product.brand).all()
-
-    buttons = []
-    for brand, count in group:
-        buttons.append([InlineKeyboardButton(
-            f'{brand}: {count}',
-            callback_data=json.dumps({'action': 'brand_list', 'brand': brand})
-        )])
-
-    return update.message.reply_html('👓 Бренды:', reply_markup=InlineKeyboardMarkup(buttons))
+    return actions.brands_list(update, context)
 
 
 def command_catalog(update, context):
-    user = get_user(update.message.from_user.id, session)
-    rows = get_catalog(session, user.id, 1)
-    wo_category_count = get_count_wo_category(session, user.id)
-
-    if len(rows) == 0 and wo_category_count == 0:
-        return update.message.reply_html('Нет данных')
-
-    if wo_category_count != 0:
-        rows.append((None, wo_category_count, 'Прочие'))
-
-    return update.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
+    return actions.products_catalog(update, context)
 
 
 def command_ping(update, context):
@@ -74,13 +38,4 @@ def command_ping(update, context):
 
 
 def command_logout(update, context):
-    user = get_user(update.message.from_user.id, session)
-    user_product_ids = session.query(UserProduct.id).filter_by(user_id=user.id).distinct()
-
-    session.query(UserProductSettings).filter(UserProductSettings.user_product_id.in_(user_product_ids)).delete(
-        synchronize_session='fetch')
-    session.query(UserProduct).filter_by(user_id=user.id).delete()
-    session.delete(user)
-    session.commit()
-
-    update.message.reply_html('👋 Все Ваши данные удалены.')
+    return actions.logout(update, context)

@@ -8,6 +8,7 @@ from common.models import UserProduct, Product, UserProductSettings
 from common.session import session
 from wbbot.misc.product_card import get_product_card, get_product_markup
 from wbbot.misc.user import get_user
+import wbbot.handlers.menu as menu
 
 
 def message_add_product(update, context):
@@ -41,8 +42,9 @@ def message_add_product(update, context):
         f'✅ Товар <a href="{code}">{product.url}</a> добавлен в список. Вы получите уведомление при изменении цены.')
 
 
-def message_search(update, context):
-    if context.user_data['action'] == 'search':
+def message_any(update, context):
+    if context.user_data.get('action') == 'search':
+        context.user_data['action'] = None
         user = get_user(update.message.from_user.id, session)
         products_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
 
@@ -55,5 +57,7 @@ def message_search(update, context):
 
         for product in products:
             update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))
+    else:
+        return menu.menu_item_select(update, context)
 
-    del context.user_data['action']
+
