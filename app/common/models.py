@@ -38,7 +38,7 @@ class UserProductSettings(Base):
     __tablename__ = 'user_product_settings'
 
     id = Column(Integer, primary_key=True)
-    user_product_id = Column(Integer, ForeignKey('user_product.id'), index=True)
+    user_product_id = Column(Integer, ForeignKey('user_product.id', ondelete='CASCADE'), index=True)
     is_price_notify = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)

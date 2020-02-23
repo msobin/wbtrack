@@ -92,7 +92,7 @@ def action_catalog_category(query, data):
     if category_id is None:
         product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
         products = session.query(Product).filter(Product.id.in_(product_ids),
-                                                 Product.catalog_category_ids.is_(None))
+                                                 Product.catalog_category_ids=='{}')
 
         for product in products:
             query.message.reply_html(get_product_card(product),

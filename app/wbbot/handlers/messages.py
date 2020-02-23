@@ -38,7 +38,8 @@ def message_add_product(update, context):
     product.ref_count += 1
     session.commit()
 
-    return update.message.reply_html(f'✅ Товар <a href="{code}">{product.url}</a> добавлен в список')
+    return update.message.reply_html(
+        f'✅ Товар <a href="{code}">{product.url}</a> добавлен в список. Вы получите уведомление при изменении цены.')
 
 
 def message_any(update, context):
