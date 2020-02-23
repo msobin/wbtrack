@@ -1,21 +1,21 @@
 ### WBTrack
 
-## Описание
-Telegram-бот для отслеживания цен на товары в интернет-магазине wildberries 
+## Description
+Telegram Bot to track product prices at wildberries online store 
 
-## Требования
+## Requirements
 
 * [docker](https://www.docker.com/) 
 * [docker-compose](https://docs.docker.com/compose/install/) 
 
-## Установка
+## Installation
 
-* склонируйте проект
-* зарегистрируйте новго бота следуя [инструкциям](https://tlgrm.ru/docs/bots#kak-sozdat-bota)
-* переименуйте файлы: .env_example в .env, docker-compose.example.yml в docker-compose.yml 
-* пропишите токен зарегистрированного бота в файле .env (параметр: BOT_TOKEN)
-* соберите контейнер командой `docker-compose build && docker-compose run app python init_db.py && docker-compose run app python wbscrapy/proxies.py`  
+* clone the project
+* register a new bot by following [instructions](https://tlgrm.ru/docs/bots#kak-sozdat-bota)
+* rename the files: .env_example to .env, docker-compose.example.yml to docker-compose.yml 
+* write the token of the registered bot in the .env file (parameter: BOT_TOKEN).
+* assemble the container by command `docker-compose build && docker-compose run app python init_db.py && docker-compose run app python wbscrapy/proxies.py `  
 
-## Использование
+## Usage
 
-* запустите контейнер командой `docker-compose up -d`
+* run the container with the command `docker-compose up -d`
