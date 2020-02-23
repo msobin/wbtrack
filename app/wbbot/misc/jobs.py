@@ -12,19 +12,15 @@ def check_prices(context):
     for product_price in product_prices:
         product = product_price.product
 
-        if not product.previous_price:
-            product_price.status = ProductPrice.STATUS_PROCESSED
-            continue
-
         user_products = session.query(UserProduct).filter_by(product_id=product.id).join(UserProduct.settings).filter(
             UserProductSettings.is_price_notify == True).all()
 
         if not len(user_products):
             product_price.status = ProductPrice.STATUS_PROCESSED
         else:
-            price_icon = get_price_icon(product.current_price_value, product.previous_price_value)
-            prev_price = ProductPrice.format_price_value(product.previous_price_value, product.domain)
-            cur_price = ProductPrice.format_price_value(product.current_price_value, product.domain)
+            price_icon = get_price_icon(product_price.value, product_price.prev_value)
+            cur_price = ProductPrice.format_price_value(product_price.value, product.domain)
+            prev_price = ProductPrice.format_price_value(product_price.prev_value, product.domain)
 
             price_text = f'{prev_price} → {cur_price}'
 

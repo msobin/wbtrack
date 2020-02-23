@@ -42,15 +42,9 @@ def action_prices_history(query, data):
     if not product_prices:
         text += 'нет данных'
 
-    for idx, product_price in enumerate(product_prices):
-        current_value = product_price.value
-        try:
-            prev_value = product_prices[idx + 1].value
-        except IndexError:
-            prev_value = None
-
-        price_icon = get_price_icon(current_value, prev_value)
-        price_value = ProductPrice.format_price_value(current_value, product.domain)
+    for product_price in product_prices:
+        price_icon = get_price_icon(product_price.value, product_price.prev_value)
+        price_value = ProductPrice.format_price_value(product_price.value, product.domain)
 
         text += f'{product_price.created_at.date()}  {price_icon} {price_value}\n'
 

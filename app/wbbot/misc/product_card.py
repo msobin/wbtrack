@@ -38,11 +38,11 @@ def get_product_markup(user_id, product):
 
 
 def format_product_price(product):
-    if not product.current_price or product.current_price.value is None:
+    if not product.price or product.price.value is None:
         return '💰 нет данных'
 
-    price_icon = get_price_icon(product.current_price_value, product.previous_price_value)
-    price_value = ProductPrice.format_price_value(product.current_price_value, product.domain)
+    price_icon = get_price_icon(product.price.value, product.price.prev_value)
+    price_value = ProductPrice.format_price_value(product.price.value, product.domain)
 
     return f'{price_icon} {price_value}'
 

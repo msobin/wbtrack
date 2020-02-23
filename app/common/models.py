@@ -67,6 +67,7 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
+    price = relationship('ProductPrice', order_by='desc(ProductPrice.id)', uselist=False)
     prices = relationship('ProductPrice', order_by='desc(ProductPrice.id)')
 
     @staticmethod
@@ -80,34 +81,6 @@ class Product(Base):
             product = session.query(Product).filter_by(domain=domain, code=code).first()
 
         return product
-
-    @property
-    def current_price(self):
-        try:
-            return self.prices[0]
-        except IndexError:
-            return None
-
-    @property
-    def previous_price(self):
-        try:
-            return self.prices[1]
-        except IndexError:
-            return None
-
-    @property
-    def current_price_value(self):
-        try:
-            return self.current_price.value
-        except AttributeError:
-            return None
-
-    @property
-    def previous_price_value(self):
-        try:
-            return self.previous_price.value
-        except AttributeError:
-            return None
 
     @property
     def header(self):
@@ -127,6 +100,7 @@ class ProductPrice(Base):
     id = Column(Integer, primary_key=True)
     product_id = Column(Integer, ForeignKey('product.id'), index=True)
     value = Column(Integer, nullable=True)
+    prev_value = Column(Integer, nullable=True)
     status = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
