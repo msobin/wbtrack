@@ -8,10 +8,13 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile
     volumes:
-      - ./docker/log:/var/log/app
+      - ./docker/log:/var/log/container
+      - ./docker/data:/etc/data
       - ./app:/app
     links:
       - postgres
+    restart: on-failure
+
 
   postgres:
     env_file:
@@ -22,10 +25,14 @@ services:
       - ./docker/log:/var/log/container
       - ./docker/postgres/data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
-    logging:
-      driver: json-file
-      options:
-        max-size: "128m"
-        max-file: "10"
+      - "54322:5432"
     restart: on-failure
+
+  redis:
+    env_file:
+      - .env
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: on-failure
+
