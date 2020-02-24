@@ -23,8 +23,18 @@ class ProductsSpider(scrapy.Spider):
         else:
             status = models.Product.STATUS_REGULAR
 
-        for product in self.session.query(models.Product).filter_by(status=status).all():
-            yield scrapy.Request(url=product.url, callback=self.parse, cb_kwargs={'product_model': product})
+        batch_size = self.crawler.settings.get('CONCURRENT_REQUESTS') * 100
+        offset = 0
+
+        while True:
+            products = self.session.query(models.Product).filter_by(status=status).limit(batch_size).offset(offset).all()
+            if not products:
+                break
+
+            for product in products:
+                yield scrapy.Request(url=product.url, callback=self.parse, cb_kwargs={'product_model': product})
+
+            offset += batch_size
 
     def parse(self, response, **kwargs):
         product_model = kwargs.get('product_model')
@@ -40,6 +50,7 @@ class ProductsSpider(scrapy.Spider):
         loader.add_xpath('price', '//span[@class="final-cost"]/text()')
         loader.add_xpath('description', '//div[contains(@class, "description-text")]/p/text()')
         loader.add_xpath('categories', '//ul[@class="bread-crumbs"]/li/a')
-        loader.add_xpath('size_list', '//div[contains(@class, "size-list") and not(contains(@class, "hide"))]/label[not(contains(@class, "disabled"))]/@data-size-name')
+        loader.add_xpath('size_list',
+                         '//div[contains(@class, "size-list") and not(contains(@class, "hide"))]/label[not(contains(@class, "disabled"))]/@data-size-name')
 
         return loader.load_item()
