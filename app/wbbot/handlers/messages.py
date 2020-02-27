@@ -8,6 +8,9 @@ from common.models import *
 from common.session import session
 from wbbot.misc.product_card import get_product_card, get_product_markup
 from wbbot.misc.user import get_user
+from common.rmq import rmq_channel
+import pika
+import json
 
 
 def message_add_product(update, context):
@@ -37,8 +40,12 @@ def message_add_product(update, context):
     product.ref_count += 1
     session.commit()
 
+    # rmq_channel.basic_publish(exchange='', routing_key=env.QUEUE_NEW_PRODUCTS,
+    #                           body=json.dumps({'user_id': user.id, 'product_id': product.id}),
+    #                           properties=pika.BasicProperties(delivery_mode=2))
+
     return update.message.reply_html(
-        f'✅ Товар <a href="{code}">{product.url}</a> добавлен в список. Вы получите уведомление при изменении цены.')
+        f'✅ Товар <a href="{code}">{product.url}</a> добавлен в список.')
 
 
 def message_any(update, context):

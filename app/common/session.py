@@ -5,7 +5,7 @@ import common.env as env
 
 engine = create_engine('postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format(
     user=env.DB_USER,
-    password=env.DB_PASSWORD,
+    password=env.DB_PASS,
     host=env.DB_HOST,
     port=env.DB_PORT,
     database=env.DB,

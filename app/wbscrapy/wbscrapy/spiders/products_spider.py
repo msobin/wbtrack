@@ -1,8 +1,13 @@
+import asyncio
+import json
+
 import scrapy
 from scrapy.loader import ItemLoader
 from wbscrapy.items import Product
 
+import common.env as env
 import common.models as models
+from common.rmq import rmq_channel
 from common.session import session
 
 
@@ -23,11 +28,27 @@ class ProductsSpider(scrapy.Spider):
         else:
             status = models.Product.STATUS_REGULAR
 
+        # if self.type == 'new':
+        #     while True:
+        #         method, properties, body = rmq_channel.basic_get(env.QUEUE_NEW_PRODUCTS)
+        #
+        #         if body:
+        #             rmq_channel.basic_ack(delivery_tag=method.delivery_tag)
+        #
+        #             data = json.loads(body)
+        #             product = self.session.query(models.Product).filter_by(id=data['product_id']).first()
+        #
+        #             yield scrapy.Request(url=product.url, callback=self.parse, cb_kwargs={'product_model': product})
+        #         else:
+        #             await asyncio.sleep(5)
+
         batch_size = self.crawler.settings.get('CONCURRENT_REQUESTS') * 100
         offset = 0
 
         while True:
-            products = self.session.query(models.Product).filter_by(status=status).limit(batch_size).offset(offset).all()
+            products = self.session.query(models.Product).filter_by(status=status).limit(batch_size).offset(
+                offset).all()
+
             if not products:
                 break
 
