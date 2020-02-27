@@ -16,7 +16,8 @@ def check_prices(context):
         user_product_price.price_start = user_product_price.price_end
 
         if len(user_products):
-            diff = abs(user_product_price.price_start - user_product_price.price_end) / user_product_price.price_start * 100
+            diff = abs(
+                user_product_price.price_start - user_product_price.price_end) / user_product_price.price_start * 100
 
             price_icon = get_price_icon(user_product_price.price_end, user_product_price.price_start)
             cur_price = ProductPrice.format_price_value(user_product_price.price_end, product.domain)
