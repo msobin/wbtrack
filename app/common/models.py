@@ -29,6 +29,7 @@ class UserProduct(Base):
     product_id = Column(Integer, ForeignKey('product.id'), index=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
+    product = relationship('Product')
     user = relationship('User')
     settings = relationship('UserProductSettings', uselist=False)
 
@@ -88,7 +89,6 @@ class Product(Base):
 
     price = relationship('ProductPrice', order_by='desc(ProductPrice.id)', uselist=False)
     prices = relationship('ProductPrice', order_by='desc(ProductPrice.id)')
-    user_products = relationship('UserProduct', lazy='dynamic')
 
     @staticmethod
     def get_product(domain, code, session):
