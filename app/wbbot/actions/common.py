@@ -1,9 +1,9 @@
 import json
 
 from sqlalchemy import func
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-from common.models import Product, UserProduct, UserProductSettings
+from common.models import *
 from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup, get_count_wo_category
 from wbbot.misc.product_card import get_product_card, get_product_markup

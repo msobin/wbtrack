@@ -1,6 +1,6 @@
 import json
 
-from common.models import Product, ProductPrice, UserProduct, UserProductSettings, UserProductPrice
+from common.models import *
 from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup

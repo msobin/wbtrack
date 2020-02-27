@@ -1,6 +1,6 @@
+from sqlalchemy import and_
+
 from common.models import *
-from sqlalchemy.orm import *
-from sqlalchemy import and_, or_
 
 
 class PostgresPipeline(object):

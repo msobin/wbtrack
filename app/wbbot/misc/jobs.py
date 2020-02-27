@@ -1,4 +1,4 @@
-from common.models import ProductPrice, UserProduct, UserProductSettings, UserProductPrice
+from common.models import *
 from common.session import session
 from wbbot.misc.product_card import get_price_icon, get_product_markup, get_size_list
 

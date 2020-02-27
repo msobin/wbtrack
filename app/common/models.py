@@ -114,6 +114,7 @@ class Product(Base):
 class ProductPrice(Base):
     __tablename__ = 'product_price'
 
+    # todo выпилить
     STATUS_NEW = 1
     STATUS_PROCESSED = 2
 
