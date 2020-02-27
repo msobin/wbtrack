@@ -32,6 +32,21 @@ class UserProduct(Base):
     product = relationship('Product')
     user = relationship('User')
     settings = relationship('UserProductSettings', uselist=False)
+    price_diff = relationship('UserProductPriceDiff')
+
+
+class UserProductPriceDiff(Base):
+    __tablename__ = 'user_product_price_diff'
+
+    id = Column(Integer, primary_key=True)
+    user_product_id = Column(Integer, ForeignKey('user_product.id'), index=True)
+    price_start = Column(Integer)
+    price_end = Column(Integer)
+    status = Column(Integer, index=True)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+    user_product = relationship('UserProduct')
 
 
 class UserProductSettings(Base):

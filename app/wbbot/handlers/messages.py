@@ -4,7 +4,7 @@ from urllib import parse
 from sqlalchemy import or_, and_
 
 import common.env as env
-from common.models import UserProduct, Product, UserProductSettings
+from common.models import UserProduct, Product, UserProductSettings, UserProductPriceDiff
 from common.session import session
 from wbbot.misc.product_card import get_product_card, get_product_markup
 from wbbot.misc.user import get_user
@@ -33,7 +33,8 @@ def message_add_product(update, context):
         return update.message.reply_text(
             f'Вы отслеживаете максимально допустимое количество товаров: {user.max_product_count})')
 
-    session.add(UserProduct(user_id=user.id, product_id=product.id, settings=UserProductSettings()))
+    session.add(UserProduct(user_id=user.id, product_id=product.id, settings=UserProductSettings(),
+                            price_diff=UserProductPriceDiff()))
 
     product.ref_count += 1
     session.commit()
@@ -59,5 +60,3 @@ def message_any(update, context):
             update.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))
     else:
         return menu.menu_item_select(update, context)
-
-

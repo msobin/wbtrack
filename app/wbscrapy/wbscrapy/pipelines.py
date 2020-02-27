@@ -31,11 +31,15 @@ class PostgresPipeline(object):
         product_model.catalog_category_ids = PostgresPipeline.process_categories(spider.session, product.get(
             'categories')) if product.get('categories') else []
 
-        price_value = product_model.price.value if product_model.price else None
+        model_price = product_model.price.value if product_model.price else None
+        product_price = product.get('price')
 
-        if price_value != product.get('price'):
+        if model_price != product_price:
             spider.session.add(
-                ProductPrice(product_id=product_model.id, value=product.get('price'), prev_value=price_value))
+                ProductPrice(product_id=product_model.id, value=product.get('price'), prev_value=model_price))
+
+        # spider.session.query().filter(UserProduct.product_id == product_model.id, UserProduct.price_start == None).update({'price_start': product_price})
+        # spider.session.query().filter(UserProduct.product_id == product_model.id, UserProduct.price_start == None).update({'price_end': product_price})
 
         spider.session.commit()
 
