@@ -1,26 +1,26 @@
-from common.models import ProductPrice, UserProduct, UserProductSettings
+from common.models import ProductPrice, UserProduct, UserProductSettings, UserProductPrice
 from common.session import session
 from wbbot.misc.product_card import get_price_icon, get_product_markup, get_size_list
 
 
 def check_prices(context):
-    product_prices = session.query(ProductPrice).filter_by(status=ProductPrice.STATUS_NEW).all()
+    user_product_prices = session.query(UserProductPrice).filter_by(status=UserProductPrice.STATUS_UPDATED).all()
 
-    if not product_prices:
-        return
-
-    for product_price in product_prices:
-        product = product_price.product
+    for user_product_price in user_product_prices:
+        product = user_product_price.product
 
         user_products = session.query(UserProduct).filter_by(product_id=product.id).join(UserProduct.settings).filter(
             UserProductSettings.is_price_notify == True).all()
 
-        if not len(user_products):
-            product_price.status = ProductPrice.STATUS_PROCESSED
-        else:
-            price_icon = get_price_icon(product_price.value, product_price.prev_value)
-            cur_price = ProductPrice.format_price_value(product_price.value, product.domain)
-            prev_price = ProductPrice.format_price_value(product_price.prev_value, product.domain)
+        user_product_price.status = UserProductPrice.STATUS_PROCESSED
+        user_product_price.price_start = user_product_price.price_end
+
+        if len(user_products):
+            diff = abs(user_product_price.price_start - user_product_price.price_end) / user_product_price.price_start * 100
+
+            price_icon = get_price_icon(user_product_price.price_end, user_product_price.price_start)
+            cur_price = ProductPrice.format_price_value(user_product_price.price_end, product.domain)
+            prev_price = ProductPrice.format_price_value(user_product_price.price_start, product.domain)
 
             price_text = f'{prev_price} → {cur_price}'
 
@@ -35,8 +35,6 @@ def check_prices(context):
                 context.job_queue.run_once(notify_user, 1,
                                            context={'telegram_id': user_product.user.telegram_id, 'text': text,
                                                     'reply_markup': reply_markup})
-
-            product_price.status = ProductPrice.STATUS_PROCESSED
 
     session.commit()
 

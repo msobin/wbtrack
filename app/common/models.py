@@ -29,24 +29,28 @@ class UserProduct(Base):
     product_id = Column(Integer, ForeignKey('product.id'), index=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
-    product = relationship('Product')
     user = relationship('User')
     settings = relationship('UserProductSettings', uselist=False)
-    price_diff = relationship('UserProductPriceDiff')
 
 
-class UserProductPriceDiff(Base):
-    __tablename__ = 'user_product_price_diff'
+class UserProductPrice(Base):
+    __tablename__ = 'user_product_price'
+
+    STATUS_NONE = None
+    STATUS_UPDATED = 1
+    STATUS_PROCESSED = 2
 
     id = Column(Integer, primary_key=True)
-    user_product_id = Column(Integer, ForeignKey('user_product.id'), index=True)
+    user_id = Column(Integer, ForeignKey('user.id'), index=True)
+    product_id = Column(Integer, ForeignKey('product.id'), index=True)
     price_start = Column(Integer)
     price_end = Column(Integer)
     status = Column(Integer, index=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    user_product = relationship('UserProduct')
+    product = relationship('Product')
+    user = relationship('User')
 
 
 class UserProductSettings(Base):
@@ -84,6 +88,7 @@ class Product(Base):
 
     price = relationship('ProductPrice', order_by='desc(ProductPrice.id)', uselist=False)
     prices = relationship('ProductPrice', order_by='desc(ProductPrice.id)')
+    user_products = relationship('UserProduct', lazy='dynamic')
 
     @staticmethod
     def get_product(domain, code, session):
