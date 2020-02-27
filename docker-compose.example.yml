@@ -28,11 +28,11 @@ services:
       - "54322:5432"
     restart: on-failure
 
-  redis:
-    env_file:
-      - .env
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-    restart: on-failure
+#  redis:
+#    env_file:
+#      - .env
+#    image: redis:alpine
+#    ports:
+#      - "6379:6379"
+#    restart: on-failure
 
