@@ -32,8 +32,9 @@ def message_add_product(update, context):
         return update.message.reply_text(
             f'Вы отслеживаете максимально допустимое количество товаров: {user.max_product_count})')
 
-    session.add(UserProduct(user_id=user.id, product_id=product.id, settings=UserProductSettings()))
-    session.add(UserProductPrice(user_id=user.id, product_id=product.id))
+    session.add(
+        UserProduct(user_id=user.id, product_id=product.id, settings=UserProductSettings(), price=UserProductPrice()))
+
     product.ref_count += 1
     session.commit()
 

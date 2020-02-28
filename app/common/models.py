@@ -32,6 +32,7 @@ class UserProduct(Base):
     product = relationship('Product')
     user = relationship('User')
     settings = relationship('UserProductSettings', uselist=False)
+    price = relationship('UserProductPrice', uselist=False)
 
 
 class UserProductPrice(Base):
@@ -42,16 +43,14 @@ class UserProductPrice(Base):
     STATUS_PROCESSED = 2
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), index=True)
-    product_id = Column(Integer, ForeignKey('product.id'), index=True)
+    user_product_id = Column(Integer, ForeignKey('user_product.id', ondelete='CASCADE'), index=True)
     price_start = Column(Integer)
     price_end = Column(Integer)
     status = Column(Integer, index=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    product = relationship('Product')
-    user = relationship('User')
+    user_product = relationship('UserProduct')
 
 
 class UserProductSettings(Base):

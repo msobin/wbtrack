@@ -41,13 +41,15 @@ class PostgresPipeline(object):
                 ProductPrice(product_id=model.id, value=new_price, prev_value=model_price))
 
         if new_price:
-            spider.session.query(UserProductPrice).filter(and_(UserProductPrice.product_id == model.id,
+            user_product_ids = spider.session.query(UserProduct.id).filter_by(product_id=model.id).distinct()
+
+            spider.session.query(UserProductPrice).filter(and_(UserProductPrice.user_product_id.in_(user_product_ids),
                                                                UserProductPrice.price_start == None,
                                                                UserProductPrice.status == None)).update(
                 {'price_start': new_price, 'price_end': new_price, 'status': UserProductPrice.STATUS_PROCESSED},
                 synchronize_session=False)
 
-            spider.session.query(UserProductPrice).filter(and_(UserProductPrice.product_id == model.id,
+            spider.session.query(UserProductPrice).filter(and_(UserProductPrice.user_product_id.in_(user_product_ids),
                                                                UserProductPrice.price_start != None,
                                                                UserProductPrice.price_end != new_price)).update(
                 {'price_end': new_price, 'status': UserProductPrice.STATUS_UPDATED},

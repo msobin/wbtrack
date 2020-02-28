@@ -41,7 +41,7 @@ class ProductsSpider(scrapy.Spider):
         offset = 0
 
         while True:
-            products = self.session.query(models.Product).filter_by(status=status).limit(batch_size).offset(
+            products = self.session.query(models.Product).filter_by(status=status, id=5).limit(batch_size).offset(
                 offset).all()
 
             if not products:
