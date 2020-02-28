@@ -14,7 +14,7 @@ import wbbot.misc.jobs as jobs
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
                         handlers=[TimedRotatingFileHandler(filename=env.LOG_DIR + '/bot.log', when='midnight',
                                                            backupCount=7)],
                         format='%(asctime)s - %(levelname)s - %(message)s')
