@@ -55,7 +55,7 @@ class PostgresPipeline(object):
                 {'price_end': new_price, 'status': UserProductPrice.STATUS_UPDATED},
                 synchronize_session=False)
 
-            spider.session.commit()
+        spider.session.commit()
 
         return product
 
