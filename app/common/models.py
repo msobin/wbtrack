@@ -130,7 +130,7 @@ class ProductPrice(Base):
     @staticmethod
     def format_price_value(value, domain):
         if not value:
-            return 'нет в продаже'
+            return 'нет в наличии'
 
         return '{0} {1}'.format('{:,}'.format(value).replace(',', ' '), ProductPrice.get_domain_currency(domain))
 
