@@ -12,9 +12,6 @@ def check_prices(context):
         user_products = session.query(UserProduct).filter_by(product_id=product.id).join(UserProduct.settings).filter(
             UserProductSettings.is_price_notify == True).all()
 
-        user_product_price.status = UserProductPrice.STATUS_PROCESSED
-        user_product_price.price_start = user_product_price.price_end
-
         if len(user_products):
             diff = abs(
                 user_product_price.price_start - user_product_price.price_end) / user_product_price.price_start * 100
@@ -36,6 +33,9 @@ def check_prices(context):
                 context.job_queue.run_once(notify_user, 1,
                                            context={'telegram_id': user_product.user.telegram_id, 'text': text,
                                                     'reply_markup': reply_markup})
+
+        user_product_price.status = UserProductPrice.STATUS_PROCESSED
+        user_product_price.price_start = user_product_price.price_end
 
     session.commit()
 

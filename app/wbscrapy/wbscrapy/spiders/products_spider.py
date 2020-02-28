@@ -1,13 +1,8 @@
-import asyncio
-import json
-
 import scrapy
 from scrapy.loader import ItemLoader
 from wbscrapy.items import Product
 
-import common.env as env
 import common.models as models
-from common.rmq import rmq_channel
 from common.session import session
 
 

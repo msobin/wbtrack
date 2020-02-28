@@ -8,9 +8,6 @@ from common.models import *
 from common.session import session
 from wbbot.misc.product_card import get_product_card, get_product_markup
 from wbbot.misc.user import get_user
-from common.rmq import rmq_channel
-import pika
-import json
 
 
 def message_add_product(update, context):
