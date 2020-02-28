@@ -19,4 +19,4 @@ DATA_DIR = os.getenv('DATA_DIR', '/etc/data')
 RABBITMQ_USER = os.getenv('RABBITMQ_DEFAULT_USER')
 RABBITMQ_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
 
-QUEUE_NEW_PRODUCTS = 'new_products'
+QUEUE_WBSCRAPY = 'wbscrapy'
