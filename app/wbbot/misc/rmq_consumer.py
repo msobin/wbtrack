@@ -14,7 +14,7 @@ class RMQConsumer(threading.Thread):
 
     def run(self):
         connection = pika.BlockingConnection(
-            pika.URLParameters('amqp://{}:{}@rabbitmq/'.format(env.RABBITMQ_USER, env.RABBITMQ_PASS)))
+            pika.URLParameters('amqp://{}:{}@rabbitmq/'.format(env.RMQ_USER, env.RMQ_PASS)))
 
         channel = connection.channel()
         channel.queue_declare(self.queue, durable=True)

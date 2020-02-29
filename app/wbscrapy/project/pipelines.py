@@ -12,8 +12,7 @@ class PostgresPipeline(object):
 
     @staticmethod
     def process_item(product, spider):
-        model = product['product_model']
-        del product['product_model']
+        model = spider.products[int(product['code'])]
 
         picker = list(map(lambda code: int(code), product.get('picker', [])))
         picker = list(filter(lambda code: code != model.code, picker))

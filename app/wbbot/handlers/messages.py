@@ -1,8 +1,11 @@
+import json
 import re
 from urllib import parse
 
+import pika
 from sqlalchemy import or_, and_
 
+import common.rmq as rmq
 import wbbot.handlers.menu as menu
 from common.models import *
 from common.session import session
@@ -38,9 +41,13 @@ def message_add_product(update, context):
     product.ref_count += 1
     session.commit()
 
-    # rmq_channel.basic_publish(exchange='', routing_key=env.QUEUE_NEW_PRODUCTS,
-    #                           body=json.dumps({'user_id': user.id, 'product_id': product.id}),
-    #                           properties=pika.BasicProperties(delivery_mode=2))
+    # todo move to rmq. make class that returns channel
+    connection = pika.BlockingConnection(rmq.get_url_parameters())
+    channel = connection.channel()
+
+    channel.basic_publish(exchange='', routing_key=env.RMQ_QUEUE_WBSCRAPY,
+                          body=json.dumps({'user_id': user.id, 'product_id': product.id}),
+                          properties=pika.BasicProperties(delivery_mode=2))
 
     return update.message.reply_html(
         f'✅ Товар <a href="{code}">{product.url}</a> добавлен в список.')

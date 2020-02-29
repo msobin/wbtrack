@@ -1,8 +1,9 @@
-import requests
-import os
 import multiprocessing
+import os
+
+import requests
+
 import common.env as env
-import urllib3
 
 
 def check_proxy(proxy):
