@@ -12,8 +12,8 @@ import common.env as env
 
 BOT_NAME = 'wbscrapy'
 
-SPIDER_MODULES = ['wbscrapy.spiders']
-NEWSPIDER_MODULE = 'wbscrapy.spiders'
+SPIDER_MODULES = ['wbscrapy.project.spiders']
+NEWSPIDER_MODULE = 'wbscrapy.project.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'wbscrapy (+http://www.yourdomain.com)'
@@ -60,13 +60,13 @@ DOWNLOADER_MIDDLEWARES = {
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
 # EXTENSIONS = {
-#    'scrapy.extensions.telnet.TelnetConsole': None,
+#    'project.extensions.telnet.TelnetConsole': None,
 # }
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'wbscrapy.pipelines.PostgresPipeline': 300,
+    'wbscrapy.project.pipelines.PostgresPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -88,7 +88,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_EXPIRATION_SECS = 0
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
-# HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+# HTTPCACHE_STORAGE = 'project.extensions.httpcache.FilesystemCacheStorage'
 
 ROTATING_PROXY_LIST_PATH = env.DATA_DIR + '/proxies.lst'
 ROTATING_PROXY_CLOSE_SPIDER = True
