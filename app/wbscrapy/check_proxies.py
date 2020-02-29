@@ -46,5 +46,5 @@ with multiprocessing.Pool(processes=30) as pool:
     good_proxies = list(filter(None, pool.map(check_proxy, proxies)))
 
 with open(proxies_file_name, 'w') as f:
-    for proxy in good_proxies:
-        print(proxy, file=f)
+    for good_proxy in good_proxies:
+        print(good_proxy, file=f)
