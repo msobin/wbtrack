@@ -39,8 +39,9 @@ class UserProductPrice(Base):
     __tablename__ = 'user_product_price'
 
     STATUS_NONE = None
-    STATUS_UPDATED = 1
-    STATUS_PROCESSED = 2
+    STATUS_APPEARED = 1
+    STATUS_UPDATED = 2
+    STATUS_PROCESSED = 100
 
     id = Column(Integer, primary_key=True)
     user_product_id = Column(Integer, ForeignKey('user_product.id', ondelete='CASCADE'), index=True)

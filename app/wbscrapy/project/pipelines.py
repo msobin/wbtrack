@@ -45,7 +45,7 @@ class PostgresPipeline(object):
             spider.session.query(UserProductPrice).filter(and_(UserProductPrice.user_product_id.in_(user_product_ids),
                                                                UserProductPrice.price_start == None,
                                                                UserProductPrice.status == None)).update(
-                {'price_start': new_price, 'price_end': new_price, 'status': UserProductPrice.STATUS_PROCESSED},
+                {'price_start': new_price, 'price_end': new_price, 'status': UserProductPrice.STATUS_APPEARED},
                 synchronize_session=False)
 
             spider.session.query(UserProductPrice).filter(and_(UserProductPrice.user_product_id.in_(user_product_ids),

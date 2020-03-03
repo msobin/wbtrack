@@ -4,7 +4,8 @@ from wbbot.misc.product_card import get_price_icon, get_product_markup, get_size
 
 
 def check_prices(context):
-    user_product_prices = session.query(UserProductPrice).filter_by(status=UserProductPrice.STATUS_UPDATED).join(
+    user_product_prices = session.query(UserProductPrice).filter(
+        UserProductPrice.status.in_([UserProductPrice.STATUS_APPEARED, UserProductPrice.STATUS_UPDATED])).join(
         UserProductSettings, UserProductPrice.user_product_id == UserProductSettings.user_product_id).filter(
         UserProductSettings.is_price_notify == True).all()
 
@@ -19,7 +20,10 @@ def check_prices(context):
         cur_price = ProductPrice.format_price_value(user_product_price.price_end, product.domain)
         prev_price = ProductPrice.format_price_value(user_product_price.price_start, product.domain)
 
-        price_text = f'{prev_price} → {cur_price}'
+        if prev_price == cur_price:
+            price_text = cur_price
+        else:
+            price_text = f'{prev_price} → {cur_price}'
 
         text = f'⚠️ Обновилась цена на {product.header}\n\n{price_icon} {price_text}'
 
