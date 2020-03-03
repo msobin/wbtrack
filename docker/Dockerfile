@@ -6,9 +6,9 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY ./app/requirements.txt /app/requirements.txt
-
 RUN pip install yacron
+
+COPY ./app/requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 COPY ./docker/supervisord.conf /etc/supervisord.conf

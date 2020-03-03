@@ -1,47 +1,23 @@
 import scrapy
 from scrapy.loader import ItemLoader
-from wbscrapy.items import Product
 
-import common.models as models
-from common.session import session
+from wbscrapy.project.items import Product
 
 
 class ProductsSpider(scrapy.Spider):
     name = "products"
 
-    def __init__(self, type=''):
-        scrapy.Spider.__init__(self)
-        self.type = type
+    def __init__(self, products, session, **kwargs):
+        super().__init__(**kwargs)
+
+        self.start_urls = [product.url for product in products]
         self.session = session
-
-    def close(self, spider, reason):
-        pass
-
-    def start_requests(self):
-        if self.type == 'new':
-            status = models.Product.STATUS_NEW
-        else:
-            status = models.Product.STATUS_REGULAR
-
-        batch_size = self.crawler.settings.get('CONCURRENT_REQUESTS') * 100
-        offset = 0
-
-        while True:
-            products = self.session.query(models.Product).filter_by(status=status).limit(batch_size).offset(offset).all()
-            if not products:
-                break
-
-            for product in products:
-                yield scrapy.Request(url=product.url, callback=self.parse, cb_kwargs={'product_model': product})
-
-            offset += batch_size
+        self.products = {product.code: product for product in products}
 
     def parse(self, response, **kwargs):
-        product_model = kwargs.get('product_model')
-
         loader = ItemLoader(item=Product(), response=response)
 
-        loader.add_value('product_model', product_model)
+        loader.add_xpath('code', '//span[@class="j-article"]/text()')
         loader.add_xpath('picker', '//div[contains(@class, "colorpicker")]/ul/li/@data-cod1s')
         loader.add_xpath('brand', '//span[@class="brand"]/text()')
         loader.add_xpath('name', '//span[@class="name"]/text()')

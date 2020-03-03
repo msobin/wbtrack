@@ -1,42 +1,38 @@
-from common.models import ProductPrice, UserProduct, UserProductSettings
+from common.models import *
 from common.session import session
 from wbbot.misc.product_card import get_price_icon, get_product_markup, get_size_list
 
 
 def check_prices(context):
-    product_prices = session.query(ProductPrice).filter_by(status=ProductPrice.STATUS_NEW).all()
+    user_product_prices = session.query(UserProductPrice).filter_by(status=UserProductPrice.STATUS_UPDATED).join(
+        UserProductSettings, UserProductPrice.user_product_id == UserProductSettings.user_product_id).filter(
+        UserProductSettings.is_price_notify == True).all()
 
-    if not product_prices:
-        return
+    for user_product_price in user_product_prices:
+        product = user_product_price.user_product.product
+        user_product = user_product_price.user_product
 
-    for product_price in product_prices:
-        product = product_price.product
+        diff_perc = abs(
+            user_product_price.price_start - user_product_price.price_end) / user_product_price.price_start * 100
 
-        user_products = session.query(UserProduct).filter_by(product_id=product.id).join(UserProduct.settings).filter(
-            UserProductSettings.is_price_notify == True).all()
+        price_icon = get_price_icon(user_product_price.price_end, user_product_price.price_start)
+        cur_price = ProductPrice.format_price_value(user_product_price.price_end, product.domain)
+        prev_price = ProductPrice.format_price_value(user_product_price.price_start, product.domain)
 
-        if not len(user_products):
-            product_price.status = ProductPrice.STATUS_PROCESSED
-        else:
-            price_icon = get_price_icon(product_price.value, product_price.prev_value)
-            cur_price = ProductPrice.format_price_value(product_price.value, product.domain)
-            prev_price = ProductPrice.format_price_value(product_price.prev_value, product.domain)
+        price_text = f'{prev_price} → {cur_price}'
 
-            price_text = f'{prev_price} → {cur_price}'
+        text = f'⚠️ Обновилась цена на {product.header}\n\n{price_icon} {price_text}'
 
-            for user_product in user_products:
-                text = f'⚠️ Обновилась цена на {product.header}\n\n{price_icon} {price_text}'
+        if product.size_list:
+            text += '\n' + get_size_list(product)
 
-                if product.size_list:
-                    text += '\n' + get_size_list(product)
+        reply_markup = get_product_markup(user_product.user.id, product)
+        context.job_queue.run_once(notify_user, 1,
+                                   context={'telegram_id': user_product.user.telegram_id, 'text': text,
+                                            'reply_markup': reply_markup})
 
-                reply_markup = get_product_markup(user_product.user.id, product)
-
-                context.job_queue.run_once(notify_user, 1,
-                                           context={'telegram_id': user_product.user.telegram_id, 'text': text,
-                                                    'reply_markup': reply_markup})
-
-            product_price.status = ProductPrice.STATUS_PROCESSED
+        user_product_price.status = UserProductPrice.STATUS_PROCESSED
+        user_product_price.price_start = user_product_price.price_end
 
     session.commit()
 

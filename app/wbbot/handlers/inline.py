@@ -1,6 +1,6 @@
 import json
 
-from common.models import Product, ProductPrice, UserProduct, UserProductSettings
+from common.models import *
 from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
@@ -23,6 +23,7 @@ def action_delete_product(query, data):
     if user_product:
         session.query(UserProductSettings).filter_by(user_product_id=user_product.id).delete()
         session.query(UserProduct).filter_by(user_id=user.id, product_id=product_id).delete()
+        session.query(UserProductPrice).filter_by(user_id=user.id, product_id=product_id).delete()
         product.ref_count -= 1
         session.commit()
     else:

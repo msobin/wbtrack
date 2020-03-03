@@ -1,12 +1,12 @@
 jobs:
-  - name: wbscrapy_new
-    command: cd /app/wbscrapy && /usr/local/bin/scrapy crawl products -a type=new
+  - name: rmq_scrapping
+    command: cd /app/wbscrapy && python rmq_scrapping.py
     schedule: "*/30 * * * *"
 
-  - name: wbscrapy_regular
-    command: cd /app/wbscrapy && /usr/local/bin/scrapy crawl products
+  - name: regular_scrapping
+    command: cd /app/wbscrapy && python regular_scrapping.py
     schedule: "0 */2 * * *"
 
   - name: update_proxies
-    command: cd /app/wbscrapy && python proxies.py
+    command: cd /app/wbscrapy && python check_proxies.py
     schedule: "0 */12 * * *"

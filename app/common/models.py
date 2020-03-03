@@ -32,6 +32,25 @@ class UserProduct(Base):
     product = relationship('Product')
     user = relationship('User')
     settings = relationship('UserProductSettings', uselist=False)
+    price = relationship('UserProductPrice', uselist=False)
+
+
+class UserProductPrice(Base):
+    __tablename__ = 'user_product_price'
+
+    STATUS_NONE = None
+    STATUS_UPDATED = 1
+    STATUS_PROCESSED = 2
+
+    id = Column(Integer, primary_key=True)
+    user_product_id = Column(Integer, ForeignKey('user_product.id', ondelete='CASCADE'), index=True)
+    price_start = Column(Integer)
+    price_end = Column(Integer)
+    status = Column(Integer, index=True)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+    user_product = relationship('UserProduct')
 
 
 class UserProductSettings(Base):
@@ -94,6 +113,7 @@ class Product(Base):
 class ProductPrice(Base):
     __tablename__ = 'product_price'
 
+    # todo выпилить
     STATUS_NEW = 1
     STATUS_PROCESSED = 2
 
@@ -110,7 +130,7 @@ class ProductPrice(Base):
     @staticmethod
     def format_price_value(value, domain):
         if not value:
-            return 'нет в продаже'
+            return 'нет в наличии'
 
         return '{0} {1}'.format('{:,}'.format(value).replace(',', ' '), ProductPrice.get_domain_currency(domain))
 
