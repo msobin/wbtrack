@@ -16,7 +16,9 @@ NOTIFY_INTERVAL = 60 * 10
 LOG_DIR = os.getenv('LOG_DIR', '/var/log/container')
 DATA_DIR = os.getenv('DATA_DIR', '/etc/data')
 
+RMQ_PORT = os.getenv('RABBITMQ_PORT', 5672)
 RMQ_USER = os.getenv('RABBITMQ_DEFAULT_USER')
 RMQ_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
 
-RMQ_QUEUE_WBSCRAPY = 'wbscrapy'
+RMQ_EXCHANGE = 'wbscrapy'
+RMQ_QUEUE_NEW_PRODUCT = 'new.product'

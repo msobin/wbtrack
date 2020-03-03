@@ -45,7 +45,7 @@ def message_add_product(update, context):
     connection = pika.BlockingConnection(rmq.get_url_parameters())
     channel = connection.channel()
 
-    channel.basic_publish(exchange='', routing_key=env.RMQ_QUEUE_WBSCRAPY,
+    channel.basic_publish(exchange=env.RMQ_EXCHANGE, routing_key=env.RMQ_QUEUE_NEW_PRODUCT,
                           body=json.dumps({'user_id': user.id, 'product_id': product.id}),
                           properties=pika.BasicProperties(delivery_mode=2))
 

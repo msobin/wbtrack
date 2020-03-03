@@ -12,23 +12,35 @@ from wbscrapy.project.spiders.products_spider import ProductsSpider
 
 connection = pika.BlockingConnection(rmq.get_url_parameters())
 channel = connection.channel()
-channel.queue_declare(env.RMQ_QUEUE_WBSCRAPY, durable=True)
+
+channel.exchange_declare(exchange=env.RMQ_EXCHANGE, exchange_type='direct')
+queue = channel.queue_declare(env.RMQ_QUEUE_NEW_PRODUCT, durable=True)
+channel.queue_bind(exchange=env.RMQ_EXCHANGE, queue=env.RMQ_QUEUE_NEW_PRODUCT, routing_key=env.RMQ_QUEUE_NEW_PRODUCT)
+
+q_len = queue.method.message_count
 
 product_ids = []
 
-while True:
-    method_frame, header_frame, body = channel.basic_get(env.RMQ_QUEUE_WBSCRAPY)
 
-    if method_frame:
-        try:
-            channel.basic_ack(method_frame.delivery_tag)
+def message_callback(ch, method, properties, body):
+    global q_len
 
-            data = json.loads(body.decode('utf-8'))
-            product_ids.append(data['product_id'])
-        except json.JSONDecodeError:
-            pass
-    else:
-        break
+    try:
+        data = json.loads(body.decode('utf-8'))
+        product_ids.append(data['product_id'])
+    except json.JSONDecodeError:
+        pass
+
+    q_len -= 1
+    if not q_len:
+        ch.stop_consuming()
+
+
+if q_len:
+    channel.basic_consume(queue=env.RMQ_QUEUE_NEW_PRODUCT, on_message_callback=message_callback, auto_ack=True)
+    channel.start_consuming()
+
+connection.close()
 
 products = session.query(Product).filter(Product.id.in_(set(product_ids))).all()
 
@@ -39,4 +51,3 @@ if products:
     process.crawl(ProductsSpider, products, session)
     process.start()
 
-connection.close()
