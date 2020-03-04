@@ -1,7 +1,9 @@
 import scrapy
 from scrapy.loader import ItemLoader
 
-from wbscrapy.project.items import Product
+from wbscrapy.project.items import ProductItem
+from common.models import *
+from sqlalchemy import func
 
 
 class ProductsSpider(scrapy.Spider):
@@ -14,8 +16,18 @@ class ProductsSpider(scrapy.Spider):
         self.session = session
         self.products = {product.code: product for product in products}
 
+        brands = self.session.query(Brand).filter(Brand.id.in_([product.brand_id for product in products])).all()
+        self.brands = {brand.title: brand for brand in brands}
+
+        catalog_categories_ids = self.session.query(func.unnest(Product.catalog_category_ids)) \
+            .filter(Product.id.in_([product.id for product in products])).distinct()
+        catalog_categories = self.session.query(CatalogCategory)\
+            .filter(CatalogCategory.id.in_(catalog_categories_ids)).all()
+
+        self.catalog_categories = {catalog_category.title: catalog_category for catalog_category in catalog_categories}
+
     def parse(self, response, **kwargs):
-        loader = ItemLoader(item=Product(), response=response)
+        loader = ItemLoader(item=ProductItem(), response=response)
 
         loader.add_xpath('code', '//span[@class="j-article"]/text()')
         loader.add_xpath('picker', '//div[contains(@class, "colorpicker")]/ul/li/@data-cod1s')

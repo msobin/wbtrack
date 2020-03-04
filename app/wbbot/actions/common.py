@@ -27,17 +27,21 @@ def products_search(update, context):
 def brands_list(update, context):
     user = get_user(update.message.from_user.id, session)
     user_product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
-    group = session.query(Product.brand, func.count(Product.brand)).filter(Product.id.in_(user_product_ids)).group_by(
-        Product.brand).all()
+
+    group = session.query(Brand.title, Brand.id, func.count(Product.brand_id)) \
+        .join(Product, Product.brand_id == Brand.id) \
+        .filter(Product.id.in_(user_product_ids)) \
+        .group_by(Brand.title, Brand.id, Product.brand_id) \
+        .order_by(Brand.title.asc())
 
     buttons = []
-    for brand, count in group:
+    for brand_title, brand_id, count in group:
         buttons.append([InlineKeyboardButton(
-            f'{brand}: {count}',
-            callback_data=json.dumps({'action': 'brand_list', 'brand': brand})
+            f'{brand_title}: {count}',
+            callback_data=json.dumps({'action': 'brand_list', 'brand_id': brand_id})
         )])
 
-    return update.message.reply_html('👓 Бренды:', reply_markup=InlineKeyboardMarkup(buttons))
+    update.message.reply_html('👓 Бренды:', reply_markup=InlineKeyboardMarkup(buttons))
 
 
 def products_catalog(update, context):
@@ -51,7 +55,7 @@ def products_catalog(update, context):
     if wo_category_count != 0:
         rows.append((None, wo_category_count, 'Прочие'))
 
-    return update.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
+    update.message.reply_html('🗂️ Категории:', reply_markup=get_catalog_markup(rows))
 
 
 def product_list_by_notify(update, context, is_notify):

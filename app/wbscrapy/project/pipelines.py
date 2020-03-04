@@ -7,73 +7,95 @@ class PostgresPipeline(object):
     def __init__(self):
         pass
 
+    def open_spider(self, spider):
+        pass
+
     def close_spider(self, spider):
         pass
 
-    @staticmethod
-    def process_item(product, spider):
-        model = spider.products[int(product['code'])]
+    def process_item(self, item, spider):
+        product = spider.products[int(item['code'])]
 
-        picker = list(map(lambda code: int(code), product.get('picker', [])))
-        picker = list(filter(lambda code: code != model.code, picker))
+        picker = list(map(lambda code: int(code), item.get('picker', [])))
+        picker = list(filter(lambda code: code != product.code, picker))
 
         for code in picker:
             if not spider.session.query(Product).filter_by(code=code).first():
                 spider.session.add(
-                    Product(code=code, domain=model.domain, status=Product.STATUS_NEW))
+                    Product(code=code, domain=product.domain, status=Product.STATUS_NEW))
 
-        model.status = Product.STATUS_REGULAR
-        model.name = product.get('name')
-        model.brand = product.get('brand')
-        model.images = product.get('images', [])
-        model.picker = picker
-        model.size_list = product.get('size_list')
-        model.updated_at = datetime.datetime.now()
-        model.catalog_category_ids = PostgresPipeline.process_categories(spider.session, product.get(
-            'categories')) if product.get('categories') else []
+        product.status = Product.STATUS_REGULAR
+        product.name = item.get('name')
+        product.brand_id = self.get_brand_id(spider, item.get('brand'))
+        product.images = item.get('images', [])
+        product.picker = picker
+        product.size_list = item.get('size_list')
+        product.updated_at = datetime.datetime.now()
+        product.catalog_category_ids = self.get_catalog_category_ids(spider, item.get('categories'))
 
-        model_price = model.price.value if model.price else None
-        new_price = product.get('price')
+        product_price = product.price.value if product.price else None
+        item_price = item.get('price')
 
-        if model_price != new_price:
+        if product_price != item_price:
             spider.session.add(
-                ProductPrice(product_id=model.id, value=new_price, prev_value=model_price))
+                ProductPrice(product_id=product.id, value=item_price, prev_value=product_price))
 
-        if new_price:
-            user_product_ids = spider.session.query(UserProduct.id).filter_by(product_id=model.id).distinct()
+        if item_price:
+            user_product_ids = spider.session.query(UserProduct.id).filter_by(product_id=product.id).distinct()
 
             spider.session.query(UserProductPrice).filter(and_(UserProductPrice.user_product_id.in_(user_product_ids),
                                                                UserProductPrice.price_start == None,
                                                                UserProductPrice.status == None)).update(
-                {'price_start': new_price, 'price_end': new_price, 'status': UserProductPrice.STATUS_APPEARED},
+                {'price_start': item_price, 'price_end': item_price, 'status': UserProductPrice.STATUS_APPEARED},
                 synchronize_session=False)
 
             spider.session.query(UserProductPrice).filter(and_(UserProductPrice.user_product_id.in_(user_product_ids),
                                                                UserProductPrice.price_start != None,
-                                                               UserProductPrice.price_end != new_price)).update(
-                {'price_end': new_price, 'status': UserProductPrice.STATUS_UPDATED},
+                                                               UserProductPrice.price_end != item_price)).update(
+                {'price_end': item_price, 'status': UserProductPrice.STATUS_UPDATED},
                 synchronize_session=False)
 
         spider.session.commit()
 
-        return product
+        return item
 
     @staticmethod
-    def process_categories(session, categories):
-        categories_dict = {v['hash']: v['category'] for v in categories}
+    def get_brand_id(spider, title):
+        # critical section ?
+        if title in spider.brands:
+            model = spider.brands[title]
+        else:
+            model = spider.session.query(Brand).filter_by(title=title).first()
 
-        hashes = list(map(lambda v: v['hash'], categories))
-        db_hashes = [v.hash for v in session.query(CatalogCategory.hash).filter(CatalogCategory.hash.in_(hashes)).all()]
-        diff_hashes = list(set(hashes) - set(db_hashes))
+            if not model:
+                model = Brand(title=title)
+                spider.session.add(model)
+                spider.session.commit()
 
-        for key in diff_hashes:
-            session.add(CatalogCategory(hash=key, title=categories_dict[key]))
+        spider.brands[title] = model
 
-        db_hash_ids = {v.hash: v.id for v in
-                       session.query(CatalogCategory).filter(CatalogCategory.hash.in_(hashes)).all()}
+        return model.id
 
-        ids = []
+    @staticmethod
+    def get_catalog_category_ids(spider, categories):
+        # critical section ?
+        category_ids = []
+
+        if categories is None:
+            return category_ids
+
         for category in categories:
-            ids.append(db_hash_ids[category['hash']])
+            if category in spider.catalog_categories:
+                model = spider.catalog_categories[category]
+            else:
+                model = spider.session.query(CatalogCategory).filter_by(title=category).first()
 
-        return ids
+                if not model:
+                    model = CatalogCategory(title=category)
+                    spider.session.add(model)
+                    spider.session.commit()
+
+            spider.catalog_categories[category] = model
+            category_ids.append(model.id)
+
+        return category_ids

@@ -25,15 +25,15 @@ def get_images(value):
 
 def get_categories(breadcrumbs):
     categories = []
+
     for a in breadcrumbs[1:]:
         selector = Selector(text=a)
         categories.append(selector.xpath('//a/span/text()').extract_first())
 
-    return list(map(lambda category: {'hash': hashlib.md5(category.encode('utf-8')).hexdigest(), 'category': category},
-                    categories))
+    return categories
 
 
-class Product(scrapy.Item):
+class ProductItem(scrapy.Item):
     code = scrapy.Field(output_processor=TakeFirst())
     picker = scrapy.Field(output_processor=Identity())
     brand = scrapy.Field(output_processor=TakeFirst())
