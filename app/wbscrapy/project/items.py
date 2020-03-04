@@ -33,7 +33,7 @@ def get_categories(breadcrumbs):
                     categories))
 
 
-class Product(scrapy.Item):
+class ProductItem(scrapy.Item):
     code = scrapy.Field(output_processor=TakeFirst())
     picker = scrapy.Field(output_processor=Identity())
     brand = scrapy.Field(output_processor=TakeFirst())

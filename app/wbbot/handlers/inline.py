@@ -5,7 +5,7 @@ from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
 from wbbot.misc.user import get_user
-
+from sqlalchemy import and_
 
 def inline_callback(update, context):
     callback_data = json.loads(update.callback_query.data)
@@ -53,13 +53,15 @@ def action_prices_history(query, data):
 
 
 def action_brand_list(query, data):
-    brand = data['brand']
+    brand_id = data['brand_id']
     user = get_user(query.from_user.id, session)
 
-    for user_product in user.user_products:
-        if user_product.product.brand == brand:
-            query.message.reply_html(get_product_card(user_product.product),
-                                     reply_markup=get_product_markup(user.id, user_product.product))
+    products = session.query(Product).filter(and_(
+        Product.id.in_([user_product.product_id for user_product in user.user_products]), Product.brand_id == brand_id)
+    )
+
+    for product in products:
+        query.message.reply_html(get_product_card(product), reply_markup=get_product_markup(user.id, product))
 
 
 def action_price_notify(query, data):

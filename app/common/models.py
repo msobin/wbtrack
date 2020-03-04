@@ -77,7 +77,7 @@ class Product(Base):
     domain = Column(String)
     code = Column(Integer)
     name = Column(String, index=True)
-    brand = Column(String, index=True)
+    brand_id = Column(Integer, ForeignKey('brand.id'), index=True)
     images = Column(ARRAY(String), default=[])
     picker = Column(ARRAY(Integer), default=[])
     ref_count = Column(Integer, default=0)
@@ -89,6 +89,7 @@ class Product(Base):
 
     price = relationship('ProductPrice', order_by='desc(ProductPrice.id)', uselist=False)
     prices = relationship('ProductPrice', order_by='desc(ProductPrice.id)')
+    brand = relationship('Brand')
 
     @staticmethod
     def get_product(domain, code, session):
@@ -104,7 +105,7 @@ class Product(Base):
 
     @property
     def header(self):
-        return f'<a href="{self.url}">{self.brand} / {self.name}</a>'
+        return f'<a href="{self.url}">{self.brand.title} / {self.name}</a>'
 
     @property
     def url(self):
@@ -147,6 +148,15 @@ class CatalogCategory(Base):
     id = Column(Integer, primary_key=True)
     hash = Column(String(32), index=True)
     title = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+
+
+class Brand(Base):
+    __tablename__ = 'brand'
+    __table_args__ = (Index('uix_brand_title', 'title', unique=True),)
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String, index=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
 
