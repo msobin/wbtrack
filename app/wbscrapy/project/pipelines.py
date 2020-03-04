@@ -26,14 +26,12 @@ class PostgresPipeline(object):
 
         product.status = Product.STATUS_REGULAR
         product.name = item.get('name')
-        # product.brand = item.get('brand')
         product.brand_id = self.get_brand_id(spider, item.get('brand'))
         product.images = item.get('images', [])
         product.picker = picker
         product.size_list = item.get('size_list')
         product.updated_at = datetime.datetime.now()
-        product.catalog_category_ids = PostgresPipeline.process_categories(spider.session, item.get(
-            'categories')) if item.get('categories') else []
+        product.catalog_category_ids = self.get_catalog_category_ids(spider, item.get('categories'))
 
         product_price = product.price.value if product.price else None
         item_price = item.get('price')
@@ -62,35 +60,42 @@ class PostgresPipeline(object):
         return item
 
     @staticmethod
-    def process_categories(session, categories):
-        categories_dict = {v['hash']: v['category'] for v in categories}
+    def get_brand_id(spider, title):
+        # critical section ?
+        if title in spider.brands:
+            model = spider.brands[title]
+        else:
+            model = spider.session.query(Brand).filter_by(title=title).first()
 
-        hashes = list(map(lambda v: v['hash'], categories))
-        db_hashes = [v.hash for v in session.query(CatalogCategory.hash).filter(CatalogCategory.hash.in_(hashes)).all()]
-        diff_hashes = list(set(hashes) - set(db_hashes))
+            if not model:
+                model = Brand(title=title)
+                spider.session.add(model)
+                spider.session.commit()
 
-        for key in diff_hashes:
-            session.add(CatalogCategory(hash=key, title=categories_dict[key]))
+        spider.brands[title] = model
 
-        db_hash_ids = {v.hash: v.id for v in
-                       session.query(CatalogCategory).filter(CatalogCategory.hash.in_(hashes)).all()}
-
-        ids = []
-        for category in categories:
-            ids.append(db_hash_ids[category['hash']])
-
-        return ids
+        return model.id
 
     @staticmethod
-    def get_brand_id(spider, title):
-        if title in spider.brands:
-            return spider.brands[title].id
+    def get_catalog_category_ids(spider, categories):
+        # critical section ?
+        category_ids = []
 
-        brand = Brand(title=title)
+        if categories is None:
+            return category_ids
 
-        spider.session.add(brand)
-        spider.session.commit()
+        for category in categories:
+            if category in spider.catalog_categories:
+                model = spider.catalog_categories[category]
+            else:
+                model = spider.session.query(CatalogCategory).filter_by(title=category).first()
 
-        spider.brands[title] = brand
+                if not model:
+                    model = CatalogCategory(title=category)
+                    spider.session.add(model)
+                    spider.session.commit()
 
-        return brand.id
+            spider.catalog_categories[category] = model
+            category_ids.append(model.id)
+
+        return category_ids

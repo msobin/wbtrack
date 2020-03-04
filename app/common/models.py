@@ -143,10 +143,9 @@ class ProductPrice(Base):
 
 class CatalogCategory(Base):
     __tablename__ = 'catalog_category'
-    __table_args__ = (Index('uix_catalog_category_hash', 'hash', unique=True),)
+    __table_args__ = (Index('uix_catalog_category_title', 'title', unique=True),)
 
     id = Column(Integer, primary_key=True)
-    hash = Column(String(32), index=True)
     title = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.now)
 
