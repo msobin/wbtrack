@@ -4,6 +4,7 @@ import os
 import requests
 
 import common.env as env
+from scrapy.selector import Selector
 
 
 def check_proxy(proxy):
@@ -37,14 +38,22 @@ if os.path.isfile(proxies_file_name):
     with open(proxies_file_name, 'r') as f:
         proxies = f.read().splitlines()
 
-f = requests.get('https://www.proxy-list.download/api/v1/get?type=https')
-proxies = proxies + f.text.splitlines()
-proxies = filter(None, proxies)
+# f = requests.get('https://www.proxy-list.download/api/v1/get?type=https')
+# proxies = proxies + f.text.splitlines()
+# proxies = filter(None, proxies)
+# proxies = list(set(proxies))
+
+response = requests.get('http://proxysearcher.sourceforge.net/Proxy%20List.php?type=http&filtered=true')
+
+if response.status_code == 200:
+    selector = Selector(text=response.text)
+    proxies = proxies + selector.xpath('//tr/td[2]/text()').extract()
+
 proxies = list(set(proxies))
 
 with multiprocessing.Pool(processes=30) as pool:
     good_proxies = list(filter(None, pool.map(check_proxy, proxies)))
 
-with open(proxies_file_name, 'w') as f:
+with open(proxies_file_name, 'w+') as f:
     for good_proxy in good_proxies:
         print(good_proxy, file=f)
