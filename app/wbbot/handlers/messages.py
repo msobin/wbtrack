@@ -57,11 +57,14 @@ def message_any(update, context):
     if context.user_data.get('action') == 'search':
         context.user_data['action'] = None
         user = get_user(update.message.from_user.id, session)
+
         products_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
 
         q = '%' + update.message.text + '%'
-        products = session.query(Product).filter(
-            and_(or_(Product.name.ilike(q), Product.brand.ilike(q)), Product.id.in_(products_ids))).all()
+        products = session.query(Product)\
+            .filter(and_(or_(Product.name.ilike(q), Brand.title.ilike(q)), Product.id.in_(products_ids)))\
+            .join(Brand, Product.brand_id == Brand.id)\
+            .all()
 
         if not products:
             update.message.reply_text('Совпадений не найдено')
