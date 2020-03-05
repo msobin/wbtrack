@@ -14,7 +14,7 @@ class ProductsSpider(scrapy.Spider):
 
         self.start_urls = [product.url for product in products]
         self.session = session
-        self.products = {product.code: product for product in products}
+        self.products = {product.url: product for product in products}
 
         brands = self.session.query(Brand).filter(Brand.id.in_([product.brand_id for product in products])).all()
         self.brands = {brand.title: brand for brand in brands}
@@ -29,6 +29,7 @@ class ProductsSpider(scrapy.Spider):
     def parse(self, response, **kwargs):
         loader = ItemLoader(item=ProductItem(), response=response)
 
+        loader.add_value('url', response.url)
         loader.add_xpath('code', '//span[@class="j-article"]/text()')
         loader.add_xpath('picker', '//div[contains(@class, "colorpicker")]/ul/li/@data-cod1s')
         loader.add_xpath('brand', '//span[@class="brand"]/text()')

@@ -34,6 +34,7 @@ def get_categories(breadcrumbs):
 
 
 class ProductItem(scrapy.Item):
+    url = scrapy.Field(output_processor=TakeFirst())
     code = scrapy.Field(output_processor=TakeFirst())
     picker = scrapy.Field(output_processor=Identity())
     brand = scrapy.Field(output_processor=TakeFirst())

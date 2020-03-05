@@ -71,7 +71,8 @@ class Product(Base):
     __table_args__ = (Index('uix_product_domain_code', 'domain', 'code', unique=True),)
 
     STATUS_NEW = 1
-    STATUS_REGULAR = 2
+    STATUS_SATELLITE = 2
+    STATUS_REGULAR = 10
 
     id = Column(Integer, primary_key=True)
     domain = Column(String)

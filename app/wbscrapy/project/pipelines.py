@@ -14,7 +14,7 @@ class PostgresPipeline(object):
         pass
 
     def process_item(self, item, spider):
-        product = spider.products[int(item['code'])]
+        product = spider.products[item.get('url')]
 
         picker = list(map(lambda code: int(code), item.get('picker', [])))
         picker = list(filter(lambda code: code != product.code, picker))
@@ -22,7 +22,7 @@ class PostgresPipeline(object):
         for code in picker:
             if not spider.session.query(Product).filter_by(code=code).first():
                 spider.session.add(
-                    Product(code=code, domain=product.domain, status=Product.STATUS_NEW))
+                    Product(code=code, domain=product.domain, status=Product.STATUS_SATELLITE))
 
         product.status = Product.STATUS_REGULAR
         product.name = item.get('name')
@@ -30,7 +30,6 @@ class PostgresPipeline(object):
         product.images = item.get('images', [])
         product.picker = picker
         product.size_list = item.get('size_list')
-        product.updated_at = datetime.datetime.now()
         product.catalog_category_ids = self.get_catalog_category_ids(spider, item.get('categories'))
 
         product_price = product.price.value if product.price else None
