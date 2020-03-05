@@ -21,7 +21,4 @@ while True:
     process.crawl(ProductsSpider, products, session)
     offset += batch_size
 
-    break
-
 process.start()
-
