@@ -30,6 +30,7 @@ class PostgresPipeline(object):
         product.images = item.get('images', [])
         product.picker = picker
         product.size_list = item.get('size_list')
+        product.updated_at = datetime.datetime.now()
         product.catalog_category_ids = self.get_catalog_category_ids(spider, item.get('categories'))
 
         product_price = product.price.value if product.price else None
