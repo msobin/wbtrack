@@ -5,8 +5,6 @@
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/items.html
 
-import hashlib
-
 import scrapy
 from scrapy.loader.processors import TakeFirst, Identity
 from scrapy.selector import Selector
