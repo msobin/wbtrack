@@ -70,11 +70,7 @@ def product_list_by_notify(update, context, is_notify):
 
 
 def logout(update, context):
-    user = user_service.get_user(update.message.from_user.id)
-
-    session.query(UserProduct).filter_by(user_id=user.id).delete()
-    session.delete(user)
-    session.commit()
+    user_service.logout(update.message.from_user.id)
 
     update.message.reply_html('👋 Все Ваши данные удалены, бот больше не будет Вас беспокоить')
 

@@ -1,4 +1,4 @@
-from app.common.models import User
+from app.common.models import User, UserProduct
 
 
 class UserService:
@@ -16,4 +16,11 @@ class UserService:
 
     def create_user(self, telegram_id):
         self.session.add(User(telegram_id=telegram_id))
+        self.session.commit()
+
+    def logout(self, telegram_id):
+        user = self.get_user(telegram_id)
+
+        self.session.query(UserProduct).filter_by(user_id=user.id).delete()
+        self.session.delete(user)
         self.session.commit()
