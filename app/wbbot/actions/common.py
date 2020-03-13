@@ -3,15 +3,15 @@ import json
 from sqlalchemy import func
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
+from common.di_container import user_service
 from common.models import *
 from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup, get_count_wo_category
 from wbbot.misc.product_card import get_product_card, get_product_markup
-from wbbot.misc.user import get_user
 
 
 def products_list_all(update, context):
-    user = get_user(update.message.from_user.id, session)
+    user = user_service.get_user(update.message.from_user.id)
 
     product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
     products = session.query(Product).filter(Product.id.in_(product_ids)).distinct()
@@ -25,7 +25,7 @@ def products_search(update, context):
 
 
 def brands_list(update, context):
-    user = get_user(update.message.from_user.id, session)
+    user = user_service.get_user(update.message.from_user.id)
     user_product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
 
     group = session.query(Brand.title, Brand.id, func.count(Product.brand_id)) \
@@ -45,7 +45,7 @@ def brands_list(update, context):
 
 
 def products_catalog(update, context):
-    user = get_user(update.message.from_user.id, session)
+    user = user_service.get_user(update.message.from_user.id)
     rows = get_catalog(session, user.id, 1)
     wo_category_count = get_count_wo_category(session, user.id)
 
@@ -59,7 +59,7 @@ def products_catalog(update, context):
 
 
 def product_list_by_notify(update, context, is_notify):
-    user = get_user(update.message.from_user.id, session)
+    user = user_service.get_user(update.message.from_user.id)
 
     product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).join(UserProduct.settings).filter(
         UserProductSettings.is_price_notify == is_notify).distinct()
@@ -70,7 +70,7 @@ def product_list_by_notify(update, context, is_notify):
 
 
 def logout(update, context):
-    user = get_user(update.message.from_user.id, session)
+    user = user_service.get_user(update.message.from_user.id)
 
     session.query(UserProduct).filter_by(user_id=user.id).delete()
     session.delete(user)

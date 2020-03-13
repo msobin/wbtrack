@@ -7,14 +7,14 @@ from sqlalchemy import or_, and_
 
 import common.rmq as rmq
 import wbbot.handlers.menu as menu
+from common.di_container import user_service
 from common.models import *
 from common.session import session
 from wbbot.misc.product_card import get_product_card, get_product_markup
-from wbbot.misc.user import get_user
 
 
 def message_add_product(update, context):
-    user = get_user(update.message.from_user.id, session)
+    user = user_service.get_user(update.message.from_user.id)
     matches = re.findall(env.PRODUCT_REGEXP, update.message.text)
 
     if matches:
@@ -56,14 +56,14 @@ def message_add_product(update, context):
 def message_any(update, context):
     if context.user_data.get('action') == 'search':
         context.user_data['action'] = None
-        user = get_user(update.message.from_user.id, session)
+        user = user_service.get_user(update.message.from_user.id)
 
         products_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
 
         q = '%' + update.message.text + '%'
-        products = session.query(Product)\
-            .filter(and_(or_(Product.name.ilike(q), Brand.title.ilike(q)), Product.id.in_(products_ids)))\
-            .join(Brand, Product.brand_id == Brand.id)\
+        products = session.query(Product) \
+            .filter(and_(or_(Product.name.ilike(q), Brand.title.ilike(q)), Product.id.in_(products_ids))) \
+            .join(Brand, Product.brand_id == Brand.id) \
             .all()
 
         if not products:

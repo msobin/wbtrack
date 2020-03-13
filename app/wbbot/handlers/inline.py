@@ -1,11 +1,13 @@
 import json
 
+from sqlalchemy import and_
+
+from common.di_container import user_service
 from common.models import *
 from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
-from wbbot.misc.user import get_user
-from sqlalchemy import and_
+
 
 def inline_callback(update, context):
     callback_data = json.loads(update.callback_query.data)
@@ -13,7 +15,7 @@ def inline_callback(update, context):
 
 
 def action_delete_product(query, data):
-    user = get_user(query.from_user.id, session)
+    user = user_service.get_user(query.from_user.id)
     product_id = data['product_id']
 
     product = session.query(Product).filter_by(id=product_id).first()
@@ -33,7 +35,7 @@ def action_delete_product(query, data):
 
 
 def action_prices_history(query, data):
-    user = get_user(query.from_user.id, session)
+    user = user_service.get_user(query.from_user.id)
 
     product = session.query(Product).filter_by(id=data['product_id']).first()
     product_prices = product.prices[:30]
@@ -53,8 +55,8 @@ def action_prices_history(query, data):
 
 
 def action_brand_list(query, data):
+    user = user_service.get_user(query.from_user.id)
     brand_id = data['brand_id']
-    user = get_user(query.from_user.id, session)
 
     products = session.query(Product).filter(and_(
         Product.id.in_([user_product.product_id for user_product in user.user_products]), Product.brand_id == brand_id)
@@ -65,7 +67,7 @@ def action_brand_list(query, data):
 
 
 def action_price_notify(query, data):
-    user = get_user(query.from_user.id, session)
+    user = user_service.get_user(query.from_user.id)
     user_product = session.query(UserProduct).filter_by(user_id=user.id, product_id=data['product_id']).first()
 
     if not user_product:
@@ -83,13 +85,13 @@ def action_price_notify(query, data):
 
 
 def action_catalog_category(query, data):
-    user = get_user(query.from_user.id, session)
+    user = user_service.get_user(query.from_user.id)
     category_id = data['id']
 
     if category_id is None:
         product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
         products = session.query(Product).filter(Product.id.in_(product_ids),
-                                                 Product.catalog_category_ids=='{}')
+                                                 Product.catalog_category_ids == '{}')
 
         for product in products:
             query.message.reply_html(get_product_card(product),
