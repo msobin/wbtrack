@@ -106,7 +106,9 @@ class Product(Base):
 
     @property
     def header(self):
-        return f'<a href="{self.url}">{self.brand.title} / {self.name}</a>'
+        brand = self.brand.title if self.brand else None
+
+        return f'<a href="{self.url}">{brand} / {self.name}</a>'
 
     @property
     def url(self):

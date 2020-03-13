@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 
-from app.common.db import Db
-from app.common.user_service import UserService
+from common.db import Db
+from common.user_service import UserService
 
 
 class Container(containers.DeclarativeContainer):

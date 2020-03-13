@@ -1,4 +1,4 @@
-from app.common.models import User, UserProduct
+from common.models import User, UserProduct
 
 
 class UserService:
