@@ -7,6 +7,7 @@ from sqlalchemy import or_, and_
 
 import common.rmq as rmq
 import wbbot.handlers.menu as menu
+from common.di_container import product_service
 from common.di_container import user_service
 from common.models import *
 from common.session import session
@@ -25,21 +26,16 @@ def message_add_product(update, context):
     domain = parsed_uri.netloc.split('.')[-1]
     code = int("".join(filter(lambda c: c.isdigit(), parsed_uri.path)))
 
-    product = Product.get_product(domain, code, session)
-    user_product = session.query(UserProduct).filter_by(user_id=user.id, product_id=product.id).first()
+    product = product_service.get_product_by_code(domain, code)
 
-    if user_product:
+    if product_service.is_user_product_exist(user.id, product.id):
         return update.message.reply_text('Вы уже отслеживаете этот товар')
 
-    if session.query(UserProduct).filter_by(user_id=user.id).count() >= user.max_product_count:
+    if product_service.get_user_product_count(user.id) >= user.max_product_count:
         return update.message.reply_text(
             f'Вы отслеживаете максимально допустимое количество товаров: {user.max_product_count})')
 
-    session.add(
-        UserProduct(user_id=user.id, product_id=product.id, settings=UserProductSettings(), price=UserProductPrice()))
-
-    product.ref_count += 1
-    session.commit()
+    product_service.add_user_product(user.id, product.id)
 
     # todo move to rmq. make class that returns channel
     connection = pika.BlockingConnection(rmq.get_url_parameters())

@@ -92,18 +92,6 @@ class Product(Base):
     prices = relationship('ProductPrice', order_by='desc(ProductPrice.id)')
     brand = relationship('Brand')
 
-    @staticmethod
-    def get_product(domain, code, session):
-        product = session.query(Product).filter_by(domain=domain, code=code).first()
-
-        if not product:
-            session.add(Product(domain=domain, code=code, status=Product.STATUS_NEW))
-            session.commit()
-
-            product = session.query(Product).filter_by(domain=domain, code=code).first()
-
-        return product
-
     @property
     def header(self):
         brand = self.brand.title if self.brand else None

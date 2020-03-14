@@ -2,9 +2,9 @@ import json
 
 from sqlalchemy import and_
 
+from common.di_container import product_service
 from common.di_container import user_service
 from common.models import *
-from common.session import session
 from wbbot.misc.catalog import get_catalog, get_catalog_markup
 from wbbot.misc.product_card import get_product_card, get_price_icon, get_product_markup
 
@@ -18,16 +18,10 @@ def action_delete_product(query, data):
     user = user_service.get_user(query.from_user.id)
     product_id = data['product_id']
 
-    product = session.query(Product).filter_by(id=product_id).first()
-    user_product = session.query(UserProduct).filter_by(user_id=user.id,
-                                                        product_id=product_id).first()
+    product = product_service.get_product_by_id(product_id)
 
-    if user_product:
-        session.query(UserProductSettings).filter_by(user_product_id=user_product.id).delete()
-        session.query(UserProduct).filter_by(user_id=user.id, product_id=product_id).delete()
-        session.query(UserProductPrice).filter_by(user_id=user.id, product_id=product_id).delete()
-        product.ref_count -= 1
-        session.commit()
+    if product_service.is_user_product_exist(user.id, product.id):
+        product_service.delete_user_product(user.id, product.id)
     else:
         return query.message.reply_text('❗ Товар не найден')
 
@@ -37,7 +31,7 @@ def action_delete_product(query, data):
 def action_prices_history(query, data):
     user = user_service.get_user(query.from_user.id)
 
-    product = session.query(Product).filter_by(id=data['product_id']).first()
+    product = product_service.get_product_by_id(data['product_id'])
     product_prices = product.prices[:30]
 
     text = f'📈 Цены на {product.header}\n\n'
@@ -58,7 +52,7 @@ def action_brand_list(query, data):
     user = user_service.get_user(query.from_user.id)
     brand_id = data['brand_id']
 
-    products = session.query(Product).filter(and_(
+    products = product_service.session.query(Product).filter(and_(
         Product.id.in_([user_product.product_id for user_product in user.user_products]), Product.brand_id == brand_id)
     )
 
@@ -68,13 +62,13 @@ def action_brand_list(query, data):
 
 def action_price_notify(query, data):
     user = user_service.get_user(query.from_user.id)
-    user_product = session.query(UserProduct).filter_by(user_id=user.id, product_id=data['product_id']).first()
+    user_product = product_service.get_user_product(user.id, data['product_id'])
 
     if not user_product:
         return
 
     user_product.settings.is_price_notify = not data['n']
-    session.commit()
+    product_service.session.commit()
 
     if user_product.settings.is_price_notify:
         text = f'🔔 Включены уведомления для {user_product.product.header}'
@@ -89,21 +83,21 @@ def action_catalog_category(query, data):
     category_id = data['id']
 
     if category_id is None:
-        product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
-        products = session.query(Product).filter(Product.id.in_(product_ids),
-                                                 Product.catalog_category_ids == '{}')
+        product_ids = product_service.session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
+        products = product_service.session.query(Product).filter(Product.id.in_(product_ids),
+                                                                 Product.catalog_category_ids == '{}')
 
         for product in products:
             query.message.reply_html(get_product_card(product),
                                      reply_markup=get_product_markup(user.id, product))
 
     else:
-        rows = get_catalog(session, user.id, data['level'], category_id)
+        rows = get_catalog(product_service.session, user.id, data['level'], category_id)
 
         if len(rows) < 2:
-            product_ids = session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
-            products = session.query(Product).filter(Product.id.in_(product_ids),
-                                                     Product.catalog_category_ids.any(category_id))
+            product_ids = product_service.session.query(UserProduct.product_id).filter_by(user_id=user.id).distinct()
+            products = product_service.session.query(Product).filter(Product.id.in_(product_ids),
+                                                                     Product.catalog_category_ids.any(category_id))
             for product in products:
                 query.message.reply_html(get_product_card(product),
                                          reply_markup=get_product_markup(user.id, product))

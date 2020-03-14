@@ -3,6 +3,8 @@ from sqlalchemy.orm import sessionmaker
 
 import common.env as env
 
+# todo выпилить
+
 engine = create_engine('postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format(
     user=env.DB_USER,
     password=env.DB_PASS,

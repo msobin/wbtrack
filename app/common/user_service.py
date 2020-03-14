@@ -10,7 +10,8 @@ class UserService:
 
         if not user:
             self.create_user(telegram_id)
-            user = self.session.query(User).filter_by(telegram_id=telegram_id).first()
+
+            return self.session.query(User).filter_by(telegram_id=telegram_id).first()
 
         return user
 

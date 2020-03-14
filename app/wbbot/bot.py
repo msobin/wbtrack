@@ -19,8 +19,8 @@ def main():
                                                            backupCount=7)],
                         format='%(asctime)s - %(levelname)s - %(message)s')
 
-    # logging.basicConfig()
-    # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    logging.basicConfig()
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
     updater = Updater(env.BOT_TOKEN, use_context=True)
     job_queue = updater.job_queue

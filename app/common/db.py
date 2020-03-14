@@ -12,7 +12,7 @@ class Db:
             host=env.DB_HOST,
             port=env.DB_PORT,
             database=env.DB,
-            echo=False
+            echo=True
         ))
 
         self.session_maker = sessionmaker(bind=self.engine)
