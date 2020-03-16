@@ -39,8 +39,8 @@ class ProductService:
 
         self.session.query(UserProductSettings).filter_by(user_product_id=user_product.id).delete()
         self.session.query(UserProduct).filter_by(user_id=user_id, product_id=product_id).delete()
-        self.session.query(UserProductPrice).filter_by(user_id=user_id, product_id=product_id).delete()
-        self.session.query().filter(Product.id == product_id).update({'ref_count': (Product.ref_count - 1)})
+        self.session.query(UserProductPrice).filter_by(user_product_id=user_product.id).delete()
+        self.session.query(Product).filter(Product.id == product_id).update({'ref_count': (Product.ref_count - 1)})
 
         self.session.commit()
 
