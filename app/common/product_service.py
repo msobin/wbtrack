@@ -30,7 +30,7 @@ class ProductService:
             UserProduct(user_id=user_id, product_id=product_id, settings=UserProductSettings(),
                         price=UserProductPrice()))
 
-        self.session.query().filter(Product.id == product_id).update({'ref_count': (Product.ref_count + 1)})
+        self.session.query(Product).filter(Product.id == product_id).update({'ref_count': (Product.ref_count + 1)})
         self.session.commit()
 
     def delete_user_product(self, user_id, product_id):
@@ -47,7 +47,7 @@ class ProductService:
     def is_user_product_exist(self, user_id, product_id):
         q = self.session.query(UserProduct).filter_by(user_id=user_id, product_id=product_id)
 
-        return self.session.query(q.exists())
+        return self.session.query(q.exists()).scalar()
 
     def get_user_product_count(self, user_id):
         return self.session.query(UserProduct).filter_by(user_id=user_id).count()
