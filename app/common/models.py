@@ -6,8 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 import common.env as env
-from common.session import engine
+from common.db import Db
 
+db = Db()
 Base = declarative_base()
 
 
@@ -150,4 +151,4 @@ class Brand(Base):
     created_at = Column(DateTime, default=datetime.datetime.now)
 
 
-Base.metadata.create_all(engine)
+Base.metadata.create_all(db.engine)

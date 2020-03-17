@@ -1,15 +1,14 @@
 import unittest
+import random
 
-# from common.product_service import ProductService
-# from tests.db import Db
+from common.di_container import product_service
 
 
 class TestProductService(unittest.TestCase):
     def setUp(self):
         pass
-        # self.product_service = ProductService(Db)
 
     def test_create_product(self):
-        pass
-        # self.product_service.create_product('tk', 123)
+        code = random.randint
+        # product_service.create_product('ru', code)
 

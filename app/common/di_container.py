@@ -12,5 +12,6 @@ class Container(containers.DeclarativeContainer):
 
 
 container = Container
+
 user_service: UserService = container.user_service()
 product_service: ProductService = container.product_service()
